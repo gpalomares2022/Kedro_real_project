@@ -8,7 +8,7 @@ from kedro.pipeline import Pipeline, node, pipeline
 from .nodes import preprocess_companies, preprocess_shuttles
 """aqui importamos las funciones de nodes (archivo nodes de la carpeta que tiene pipeline)"""
 
-"""Ahora creamos un pipeline con los nodos"""
+"""Ahora creamos un pipeline con los nodos que queramos"""
 def create_pipeline(**kwargs) -> Pipeline:
     return pipeline(
         [
