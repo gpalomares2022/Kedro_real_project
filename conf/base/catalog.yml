@@ -9,6 +9,18 @@ companies:
 
  filepath: data/01_raw/companies.csv
 
+processed_xml_enfermedades:
+
+ type: pandas.XMLDataSet
+
+ filepath: data/01_raw/enfermedades.xml
+
+processed_enfermedades:
+
+ type: pandas.CSVDataSet
+
+ filepath: data/01_raw/enfermedades.csv
+
 reviews:
 
  type: pandas.CSVDataSet
@@ -24,6 +36,10 @@ shuttles:
  load_args:
 
   engine: openpyxl # Use modern Excel engine (the default since Kedro 0.18.0)
+
+ fs_args:
+  open_args_load:
+   mode: "rb"
 
 preprocessed_companies:
 
