@@ -111,8 +111,8 @@ def clean_selection_and_preparation_data(csv_enfermedades: pd.DataFrame):
 def selection_and_preparation_data(clean_and_processed_enfermedades: pd.DataFrame):
     
     data=clean_and_processed_enfermedades
-    # data=data[(data['Frecuencia']=="Muy frecuente (99-80%)") | (data['Frecuencia']=="Frecuente (79-30%)")]
-    data=data[(data['Frecuencia']=="Muy frecuente (99-80%)")]
+    data=data[(data['Frecuencia']=="Muy frecuente (99-80%)") | (data['Frecuencia']=="Frecuente (79-30%)")]
+   # data=data[(data['Frecuencia']=="Muy frecuente (99-80%)")]
     logger.info ("Despues de quitar frecuencias")
     logger.info ("Enfermedades: ", data["Enfermedad"].nunique())
     logger.info ("Sintomas: ", data["Sintoma"].nunique())
@@ -138,7 +138,7 @@ def generate_data_train (clean_and_processed_enfermedades: pd.DataFrame):
     
     z=0
     j=0
-    repeticiones=15
+    repeticiones=10
     while (z<repeticiones):
     
   #  print ("entra")

@@ -12,17 +12,17 @@ from .nodes import import_enfermedades_xml, clean_selection_and_preparation_data
 def create_pipeline(**kwargs) -> Pipeline:
     return pipeline(
         [
-            # node(
+             node(
 
-            #    func=import_enfermedades_xml,
+                func=import_enfermedades_xml,
 
-            #    inputs="params:processing_options",
+                inputs="params:processing_options",
 
-            #    outputs="csv_enfermedades",
+                outputs="csv_enfermedades",
 
-            #     name="import_enfermedades_xml_node",
+                name="import_enfermedades_xml_node",
 
-            # ),
+            ),
             node(
 
                func=clean_selection_and_preparation_data,
