@@ -82,7 +82,7 @@ def train_model(X_train: pd.DataFrame, y_train: pd.DataFrame, X_test: pd.DataFra
      #rf = LGBMRegressor(**params_lgbm)
      
      #rf_gscv.fit(X_train, y_train)
-     logger.info ("terminé grid y rf")
+     logger.info ("terminé  rf")
      #new_names = {col: re.sub(r'[^A-Za-z0-9_]+', '', col) for col in X_test.columns}
      #new_n_list = list(new_names.values())
 # [LightGBM] Feature appears more than one time.
