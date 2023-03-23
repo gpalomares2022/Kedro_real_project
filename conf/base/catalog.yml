@@ -3,66 +3,28 @@
 # Documentation for this file format can be found in "The Data Catalog"
 # Link: https://kedro.readthedocs.io/en/stable/data/data_catalog.html
 
-companies:
-
- type: pandas.CSVDataSet
-
- filepath: data/01_raw/companies.csv
-
 processed_xml_enfermedades:
 
  type: pandas.XMLDataSet
-
  filepath: data/01_raw/enfermedades.xml
 
-processed_enfermedades:
+csv_enfermedades:
 
  type: pandas.CSVDataSet
+ filepath: data/01_raw/enfermedades20M.csv
 
- filepath: data/01_raw/enfermedades.csv
+clean_and_processed_enfermedades:
+  type: pandas.CSVDataSet
+  filepath: data/03_primary/df_clean.csv 
+  
 
-reviews:
-
+data_train_enfermedades:
  type: pandas.CSVDataSet
+ filepath: data/03_primary/df_train.csv 
 
- filepath: data/01_raw/reviews.csv
-
-shuttles:
-
- type: pandas.ExcelDataSet
-
- filepath: data/01_raw/shuttles.xlsx
-
- load_args:
-
-  engine: openpyxl # Use modern Excel engine (the default since Kedro 0.18.0)
-
- fs_args:
-  open_args_load:
-   mode: "rb"
-
-preprocessed_companies:
-
- type: pandas.ParquetDataSet
-
- filepath: data/02_intermediate/preprocessed_companies.parquet
-
-preprocessed_shuttles:
-
- type: pandas.ParquetDataSet
-
- filepath: data/02_intermediate/preprocessed_shuttles.parquet
-
-model_input_table:
-
- type: pandas.ParquetDataSet
-
- filepath: ./data/03_primary/model_input_table.parquet
-
-regressor:
+classificator:
   type: pickle.PickleDataSet
-  filepath: data/06_models/regressor.pickle
-  versioned: true 
+  filepath: data/06_models/model.pickle 
 
 X_train:
   type: pickle.PickleDataSet

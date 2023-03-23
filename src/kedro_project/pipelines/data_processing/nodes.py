@@ -5,31 +5,17 @@ generated using Kedro 0.18.5
 import pandas as pd
 import xmltodict
 from typing import Dict, Tuple
-"""Es una función interna por tener barra baja
-YA AQUÍ DEVOLVEMOS TIPOS DE LAS VARIABLES Y LO QUE DEVUELVE """
-def _is_true(x: pd.Series,) -> pd.Series:
+import logging
+import numpy as np
+import random
+import warnings
 
-  return x == "t"
-"""DEVUELVE BOOLEANO SI X=='t'. ES LA TÍPICA FUNCIÓN PARA CONVERTIR UNA CADENA 'T' EN TRUE, QUE ES COMO DEBE TRABAJARSE"""
 
-"""Es una función interna por tener barra baja"""
-def _parse_percentage(x: pd.Series) -> pd.Series:
+logger = logging.getLogger(__name__)
+warnings.filterwarnings("ignore")
 
-  x = x.astype(str).str.replace("%", "")
 
-  x = x.astype(float) / 100
 
-  return x
-  """CAMBIA UN EJEMPLO: 10% POR 0.1, QUE ES MÁS ÚTIL PARA OPERAR.. NO NOS VALE PARA NADA 10%"""
-"""Es una función interna por tener barra baja"""
-def _parse_money(x: pd.Series) -> pd.Series:
-
-  x = x.astype(str).str.replace("$", "").str.replace(",", "")
-
-  x = x.astype(float)
-
-  return x
-"""QUITA LOS DOLARES Y COMAS"""
 def _limpia_nombre (cadena):
     
     cadena_str= str(cadena)
@@ -46,6 +32,7 @@ def import_enfermedades_xml(parameters: Dict):
     df_enfermedades = pd.DataFrame()
     lista_enfer_sinto_prob=[]
     first_tree=xmldict["JDBOR"]["HPODisorderSetStatusList"]["HPODisorderSetStatus"]
+    id=0
 
     for nodo in xmldict["JDBOR"]["HPODisorderSetStatusList"]["HPODisorderSetStatus"]:
         
@@ -57,124 +44,139 @@ def import_enfermedades_xml(parameters: Dict):
             registro_enfer_sinto_prob=[]
             while (i<tam_sintomas):
                 registro_enfer_sinto_prob.append(enfermedad)
+                registro_enfer_sinto_prob.append(id)
+
                 registro_enfer_sinto_prob.append(sec_tree["HPODisorderAssociation"][i]["HPO"]["HPOTerm"])
                 frecuencia=_limpia_nombre(sec_tree["HPODisorderAssociation"][i]["HPOFrequency"]["Name"])
                 registro_enfer_sinto_prob.append(frecuencia)
                 lista_enfer_sinto_prob.append (registro_enfer_sinto_prob)
                 registro_enfer_sinto_prob=[]
                 i=i+1
+        id=id+1
+
     df_enfermedades = pd.DataFrame(lista_enfer_sinto_prob)
-    df_enfermedades = df_enfermedades.rename(columns={0:'Enfermedad',1:'Sintoma', 2:"Frecuencia"})
+    df_enfermedades = df_enfermedades.rename(columns={0:'Enfermedad',1:'Id_Enfermedad', 2:'Sintoma', 3:"Frecuencia"})
     return df_enfermedades
 
+def clean_selection_and_preparation_data(csv_enfermedades: pd.DataFrame): 
+        
 
+        data=csv_enfermedades
+        numero=float(data["Enfermedad"].nunique())
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-def preprocess_companies(companies: pd.DataFrame) -> pd.DataFrame:
-
-  """Preprocesses the data for companies.
-  
-  FIJAOS!!! CADA FUNCIÓN DE PYTHON, ES UN NODO EN EL PIPELINE!!!!!
-
-
-
-  Args:
-
-    companies: Raw data.
-
-  Returns:
-
-    Preprocessed data, with `company_rating` converted to a float and
-
-    `iata_approved` converted to boolean.
-
-  """
-
-  companies["iata_approved"] = _is_true(companies["iata_approved"])
-
-  companies["company_rating"] = _parse_percentage(companies["company_rating"])
-
-  return companies
-
-
-
-
-
-def preprocess_shuttles(shuttles: pd.DataFrame) -> pd.DataFrame:
-
-  """Preprocesses the data for shuttles.
-
-
-
-  Args:
-
-    shuttles: Raw data.
-
-  Returns:
-
-    Preprocessed data, with `price` converted to a float and `d_check_complete`,
-
-    `moon_clearance_complete` converted to boolean.
-
-  """
-
-  shuttles["d_check_complete"] = _is_true(shuttles["d_check_complete"])
-
-  shuttles["moon_clearance_complete"] = _is_true(shuttles["moon_clearance_complete"])
-
-  shuttles["price"] = _parse_money(shuttles["price"])
-
-  return shuttles
-
-def create_model_input_table(
-
-        shuttles: pd.DataFrame,
-
-        companies: pd.DataFrame,
-
-        reviews: pd.DataFrame,
-
-        ) -> pd.DataFrame:
-
+        logger.info ("Inicial")
+        #logger.info ("Enfermedades: ", format(numero))
+        logger.info(f'Enfermedades={numero}')
+       # 'It will cost ${0} dollars.'.format(95)
+        logger.info(f'Sintomas={data["Sintoma"].nunique()}')
+        logger.info(f'Frecuencias={data["Frecuencia"].nunique()}')
+      #  logger.info ("Sintomas: ", str(data["Sintoma"].nunique()))
+       # logger.info ("Frecuencias: ", str(data["Frecuencia"].nunique()))
     
+        data=data.drop_duplicates()
+        data=data.dropna()
+        logger.info ("Despues de quitar registros duplicados y check nulos")
+        numero=float(data["Enfermedad"].nunique())
+        logger.info(f'Enfermedades={numero}')
+       # 'It will cost ${0} dollars.'.format(95)
+        logger.info(f'Sintomas={data["Sintoma"].nunique()}')
+        logger.info(f'Frecuencias={data["Frecuencia"].nunique()}')
+        vc = data["Sintoma"].value_counts()
+        vector=vc[vc < 100].index
+        for a in vector:
+            # Get names of indexes for which column Stock has value No
+            indexNames = data [ data["Sintoma"] == a ].index
+            # Delete these row indexes from dataFrame
+            for b in indexNames:
+                data.drop(b , inplace=True, axis=0)
+        
+        logger.info ("Despues de quitar sintomas que solo aparecen menos de 50 veces")
+        
+        numero=float(data["Enfermedad"].nunique())
+        logger.info(f'Enfermedades={numero}')
+       # 'It will cost ${0} dollars.'.format(95)
+        logger.info(f'Sintomas={data["Sintoma"].nunique()}')
+        logger.info(f'Frecuencias={data["Frecuencia"].nunique()}')
+        #data=data[(data['Frecuencia']=="Muy frecuente (99-80%)") | (data['Frecuencia']=="Frecuente (79-30%)")]
+        #data=data[(data['Frecuencia']=="Muy frecuente (99-80%)")]
+        #data=data[(data['Frecuencia']=="Frecuente (79-30%)")]
+        logger.info ("Despues de quitar frecuencias")
+        numero=float(data["Enfermedad"].nunique())
+        logger.info(f'Enfermedades={numero}')
+       # 'It will cost ${0} dollars.'.format(95)
+        logger.info(f'Sintomas={data["Sintoma"].nunique()}')
+        logger.info(f'Frecuencias={data["Frecuencia"].nunique()}')
+        return data  
 
-    rated_shuttles = shuttles.merge(
-
-        reviews,
-
-        left_on = 'id',
-
-        right_on ='shuttle_id',
-
-    )
-
-
-
-    table = rated_shuttles.merge(
-
-        companies,
-
-        left_on = 'company_id',
-
-        right_on = 'id',
-
-        ).dropna()
-
+def selection_and_preparation_data(clean_and_processed_enfermedades: pd.DataFrame):
     
+    data=clean_and_processed_enfermedades
+    # data=data[(data['Frecuencia']=="Muy frecuente (99-80%)") | (data['Frecuencia']=="Frecuente (79-30%)")]
+    data=data[(data['Frecuencia']=="Muy frecuente (99-80%)")]
+    logger.info ("Despues de quitar frecuencias")
+    logger.info ("Enfermedades: ", data["Enfermedad"].nunique())
+    logger.info ("Sintomas: ", data["Sintoma"].nunique())
+    logger.info ("Frecuencias: ", data["Frecuencia"].nunique())    
+    return data
 
-    return table
-
+def generate_data_train (clean_and_processed_enfermedades: pd.DataFrame):
+    
+    logger.info ("Creamos datos entrenamiento")
+    data=clean_and_processed_enfermedades
+    sintomas=data.iloc[:,2]
+    sintomas_sin_repe=sintomas.drop_duplicates()
+    
+    df_train=pd.DataFrame(columns=sintomas_sin_repe)
+    #df_train.insert(0, 'Enfermedad', 0)
+    df_train.insert(0, 'id_Enfermedad', 0)
+ 
+    
+    data_agrupado = (data.groupby("Enfermedad")
+         .agg({"Sintoma": np.array, "Frecuencia": np.array})
+         .reset_index()
+         )
+    
+    z=0
+    j=0
+    repeticiones=15
+    while (z<repeticiones):
+    
+  #  print ("entra")
+        i=0
+        for a in data_agrupado["Enfermedad"]:
+           # print ("Enfermedad: ", a)
+        #vector_enfermedad.append(a)
+        #lista=[]
+            lst = [0] * ((len(sintomas_sin_repe)+1))
+            df_train.loc[len(df_train)] = lst
+            #df_train["Enfermedad"][j]=a
+            df_train["id_Enfermedad"][j]=i
+            #df_train.loc[:, ('id_Enfermedad', j)] = (i+1)
+            pos=0
+            for b in data_agrupado["Sintoma"][i]:
+                valor_aleatorio = random.random()
+                frecuencia=data_agrupado["Frecuencia"][i][pos]
+            #    print ("frecuencia:", frecuencia)
+                if (frecuencia=="Muy frecuente (99-80%)"):
+             #       print (b)
+              #      print ("es muy frecuente")
+                    if (valor_aleatorio>0.2):
+                        valor_entero=1
+                    else:
+                        valor_entero=0
+                elif (frecuencia=="Frecuente (79-30%)"):
+               #     print (b)
+                #    print ("es frecuente")
+                    if (valor_aleatorio>0.7):
+                        valor_entero=1
+                    else:
+                        valor_entero=0
+                df_train[b][j]=valor_entero
+                #df_train.loc[:,(b,j)]= valor_entero
+                pos=pos+1
+            j=j+1
+            i=i+1
+        z=z+1
+       
+    print ("TOTAL: ", j)    
+    return df_train  

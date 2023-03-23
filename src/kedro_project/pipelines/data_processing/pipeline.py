@@ -5,46 +5,44 @@ generated using Kedro 0.18.5
 
 from kedro.pipeline import Pipeline, node, pipeline
 
-from .nodes import preprocess_companies, preprocess_shuttles, create_model_input_table, import_enfermedades_xml
+from .nodes import import_enfermedades_xml, clean_selection_and_preparation_data, generate_data_train
 """aqui importamos las funciones de nodes (archivo nodes de la carpeta que tiene pipeline)"""
 
 """Ahora creamos un pipeline con los nodos que queramos eah"""
 def create_pipeline(**kwargs) -> Pipeline:
     return pipeline(
         [
+            # node(
+
+            #    func=import_enfermedades_xml,
+
+            #    inputs="params:processing_options",
+
+            #    outputs="csv_enfermedades",
+
+            #     name="import_enfermedades_xml_node",
+
+            # ),
             node(
-               
-                func=preprocess_companies,
-                inputs="companies",
-                outputs="preprocessed_companies",
-                name="preprocess_companies_node",
+
+               func=clean_selection_and_preparation_data,
+
+               inputs="csv_enfermedades",
+
+               outputs="clean_and_processed_enfermedades",
+
+                name="clean_selection_and_preparation_data_node",
+
             ),
             node(
-                func=preprocess_shuttles,
-                inputs="shuttles",
-                outputs="preprocessed_shuttles",
-                name="preprocess_shuttles_node",
-            ),
-            node(
 
-                func=create_model_input_table,
+               func=generate_data_train,
 
-                inputs=["preprocessed_shuttles","preprocessed_companies", "reviews"],
+               inputs="clean_and_processed_enfermedades",
 
-                outputs="model_input_table",
+               outputs="data_train_enfermedades",
 
-                name="create_model_input_table_node",
-
-            ),
-            node(
-
-                func=import_enfermedades_xml,
-
-                inputs="params:processing_options",
-
-                outputs="processed_enfermedades",
-
-                name="import_enfermedades_xml_node",
+               name="generate_data_train_node",
 
             ),
             
