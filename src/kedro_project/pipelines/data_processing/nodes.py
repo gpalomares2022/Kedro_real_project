@@ -82,6 +82,8 @@ def clean_selection_and_preparation_data(csv_enfermedades: pd.DataFrame):
         logger.info(f'Sintomas={data["Sintoma"].nunique()}')
         logger.info(f'Frecuencias={data["Frecuencia"].nunique()}')
         vc = data["Sintoma"].value_counts()
+
+        
         vector=vc[vc < 100].index
         for a in vector:
             # Get names of indexes for which column Stock has value No
