@@ -67,7 +67,7 @@ def clean_selection_and_preparation_data(csv_enfermedades: pd.DataFrame):
         logger.info ("Inicial")
         #logger.info ("Enfermedades: ", format(numero))
         logger.info(f'Enfermedades={numero}')
-       # 'It will cost ${0} dollars.'.format(95)
+      
         logger.info(f'Sintomas={data["Sintoma"].nunique()}')
         logger.info(f'Frecuencias={data["Frecuencia"].nunique()}')
       #  logger.info ("Sintomas: ", str(data["Sintoma"].nunique()))
@@ -78,7 +78,7 @@ def clean_selection_and_preparation_data(csv_enfermedades: pd.DataFrame):
         logger.info ("Despues de quitar registros duplicados y check nulos")
         numero=float(data["Enfermedad"].nunique())
         logger.info(f'Enfermedades={numero}')
-       # 'It will cost ${0} dollars.'.format(95)
+      
         logger.info(f'Sintomas={data["Sintoma"].nunique()}')
         logger.info(f'Frecuencias={data["Frecuencia"].nunique()}')
         vc = data["Sintoma"].value_counts()
@@ -94,7 +94,7 @@ def clean_selection_and_preparation_data(csv_enfermedades: pd.DataFrame):
         
         numero=float(data["Enfermedad"].nunique())
         logger.info(f'Enfermedades={numero}')
-       # 'It will cost ${0} dollars.'.format(95)
+       
         logger.info(f'Sintomas={data["Sintoma"].nunique()}')
         logger.info(f'Frecuencias={data["Frecuencia"].nunique()}')
         #data=data[(data['Frecuencia']=="Muy frecuente (99-80%)") | (data['Frecuencia']=="Frecuente (79-30%)")]
@@ -103,7 +103,7 @@ def clean_selection_and_preparation_data(csv_enfermedades: pd.DataFrame):
         logger.info ("Despues de quitar frecuencias")
         numero=float(data["Enfermedad"].nunique())
         logger.info(f'Enfermedades={numero}')
-       # 'It will cost ${0} dollars.'.format(95)
+    
         logger.info(f'Sintomas={data["Sintoma"].nunique()}')
         logger.info(f'Frecuencias={data["Frecuencia"].nunique()}')
         return data  
