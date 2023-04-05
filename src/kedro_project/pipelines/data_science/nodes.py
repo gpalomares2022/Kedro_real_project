@@ -1,5 +1,6 @@
 import logging
 from typing import Dict, Tuple
+from git import List
 import pandas as pd
 import sklearn
 from sklearn.ensemble import RandomForestClassifier
@@ -21,6 +22,14 @@ from sklearn.preprocessing import LabelEncoder
 
 
 logger = logging.getLogger(__name__)
+
+def _saca_enfermedades (vector,df_Enfermedades):
+    
+    enfermedades=[]
+    for j in vector:
+        enfermedades.append(df_Enfermedades[df_Enfermedades["index"]==j]["Enfermedad"])
+        
+    return enfermedades
 
 def _aparece_y_como (scoring_enfermedades,id_Sintoma, df_Enfermedades, df_Sintomas,df_EnfeySinto_select):
     
@@ -56,8 +65,80 @@ def _aparece_y_como (scoring_enfermedades,id_Sintoma, df_Enfermedades, df_Sintom
         
     return df_enfermedades
 
+def _aparece_y_como2 (enfermedades, df_Enfermedades, df_Sintomas,df_EnfeySinto_select):
+    
 
+    
+    j=0
+    lista_todo=[]
+    df_enfermedades=pd.DataFrame()
+    while (j<len(enfermedades)):
+        enfermedad=[]
+        id_enfermedad=enfermedades[j]
+        #scoring=scoring_enfermedades[id_Sintoma][j]
+        
+        enfermedad.append(id_enfermedad)
+       
+        enfermedad.append(df_Enfermedades[df_Enfermedades["index"]==id_enfermedad]["Enfermedad"].values[0])
+   
+       # enfermedad.append(scoring)
+        #lista=df_EnfeySinto_select[df_EnfeySinto_select["Enfermedad"]==
+         #                          df_Enfermedades.loc[id_enfermedad][1]]
+        #lista=lista.reset_index()
+        #sintoma= df_Sintomas.loc[id_Sintoma].Sintoma
+        
+        #i=0
+        #while i<len(lista):
+         
+         #   if lista["Sintoma"][i]==sintoma:
+          #      enfermedad.append(lista["Frecuencia"][i])
+            
+           # i=i+1  
+        #j=j+1
+        lista_todo.append(enfermedad)
+        j=j+1
+    lista_todo=pd.DataFrame(lista_todo)
+        
+    return lista_todo
+def trata_sintomas2 (parameters: list,df_transpuesta,df_enfermedades,df_sintomas,df_todo):
+    comunes=[]
+    logger.info(f'Param={parameters}')
+    logger.info(f'sintomas?={parameters["sintomas"]}')
+    sintomas=parameters["sintomas"]
+    logger.info(f'Sintomas={sintomas}')
+    primera_iter=True
+    df_matrix=df_transpuesta
+    lista=[]
+    for i in sintomas:
+        diccionario={
+            "sintoma" : i,
+            "clasificados" : 100
+        }
+        vector=[]
+        #lista,vector=predict_similitud_entre_usuarios_by_pearson(df_transpuesta,i,20)
+        v=predict_collaborative_filtering_ser_based(df_matrix, diccionario,df_sintomas,df_enfermedades,df_todo)
+        logger.info(f'esto?={v}')
+ #resul=nodes.predict_collaborative_filtering_ser_based (df_matrix,diccionario,df_sintomas,df_enfermedades,df_todo)
+    
+        
+        enfermedades=v[0]
+        enfermedades=list(enfermedades)
+        logger.info(f'enfermedades?={enfermedades}')
+      
+        if primera_iter:
+            comunes=enfermedades
+            primera_iter=False
 
+        else:            
+            comunes = set(comunes).intersection(enfermedades)
+        
+        
+    #enfermedades=_saca_enfermedades(comunes,df_enfermedades)
+    enfermedades=_aparece_y_como2 (list(comunes), df_enfermedades, df_sintomas,df_todo)
+    #logger.info(f'enfermeada?={enfermedades}')
+   # print (enfermedades)
+   # enfermedades=pd.DataFrame(enfermedades)
+    return enfermedades
 
 def predict_collaborative_filtering_ser_based(data_matrix: pd.DataFrame, parameters: Dict, 
                                               csv_sintomas: pd.DataFrame, csv_enfermedades: pd.DataFrame, 
@@ -106,6 +187,10 @@ def predict_collaborative_filtering_ser_based(data_matrix: pd.DataFrame, paramet
     vector_id_enfermedad_scoring = vector_id_enfermedad_scoring.rename(columns={1:id_sintoma, 0:"index"})
     
     listado_completo=_aparece_y_como (vector_id_enfermedad_scoring,id_sintoma, df_Enfermedades, df_Sintomas,df_EnfeySinto_select)
+    listado_completo=listado_completo.rename(columns={1: "Enfermedad", 2: "Scoring", 3: "Frecuencia"})
+    listado_completo=listado_completo.sort_values("Scoring", ascending=False)
+    listado_completo=listado_completo.reset_index()
+    listado_completo.drop("index", axis=1, inplace=True)
     #listado_completo= list(reserved(listado_completo))
     logger.info(f'Result={listado_completo}')
     return listado_completo

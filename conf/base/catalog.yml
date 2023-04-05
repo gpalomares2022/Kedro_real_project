@@ -30,6 +30,10 @@ data_calculated_scoring:
  type: pandas.CSVDataSet
  filepath: data/07_model_output/Data_Calculated.csv
 
+data_calculated_multi_scoring:
+ type: pandas.CSVDataSet
+ filepath: data/07_model_output/Data_Calculated_Multi.csv
+
 csv_sintomas:
 
  type: pandas.CSVDataSet

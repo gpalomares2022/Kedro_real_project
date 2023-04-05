@@ -1,7 +1,7 @@
 from kedro.pipeline import Pipeline, node, pipeline
 
 
-from .nodes import predict_collaborative_filtering_ser_based
+from .nodes import predict_collaborative_filtering_ser_based, trata_sintomas2
 
 
 def create_pipeline(**kwargs) -> Pipeline:
@@ -13,5 +13,13 @@ def create_pipeline(**kwargs) -> Pipeline:
                 outputs="data_calculated_scoring",
                 name="predict_collaborative_filtering_ser_based_node",
             ),
+            node(
+                func=trata_sintomas2,
+                inputs=["params:model_options","data_matrix","csv_enfermedades","csv_sintomas","clean_and_processed_enfermedades"],
+                outputs="data_calculated_multi_scoring",
+                name="trata_sintomas2_node",
+            ),
+
+            
         ]
     )
