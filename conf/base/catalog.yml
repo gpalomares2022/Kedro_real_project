@@ -8,19 +8,32 @@ processed_xml_enfermedades:
  type: pandas.XMLDataSet
  filepath: data/01_raw/enfermedades.xml
 
-csv_enfermedades:
-
+csv_enfermedades_and_sintomas:
  type: pandas.CSVDataSet
- filepath: data/01_raw/enfermedades20M.csv
+ filepath: data/01_raw/sintomas_and_enfermedades_prepaired.csv
 
 clean_and_processed_enfermedades:
   type: pandas.CSVDataSet
-  filepath: data/03_primary/df_clean.csv 
-  
-
-data_train_enfermedades:
+  filepath: data/03_primary/sintomas_and_enfermedades_prepaired.csv
+ 
+data_matrix:
  type: pandas.CSVDataSet
- filepath: data/03_primary/df_train.csv 
+ filepath: data/03_primary/df_matrix.csv 
+
+csv_enfermedades:
+
+ type: pandas.CSVDataSet
+ filepath: data/01_raw/enfermedades.csv
+
+data_calculated_scoring:
+
+ type: pandas.CSVDataSet
+ filepath: data/07_model_output/Data_Calculated.csv
+
+csv_sintomas:
+
+ type: pandas.CSVDataSet
+ filepath: data/01_raw/sintomas.csv
 
 classificator:
   type: pickle.PickleDataSet

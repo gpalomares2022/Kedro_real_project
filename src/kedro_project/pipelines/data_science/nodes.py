@@ -1,6 +1,7 @@
 import logging
 from typing import Dict, Tuple
 import pandas as pd
+import sklearn
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import r2_score
 from sklearn.model_selection import train_test_split
@@ -21,118 +22,90 @@ from sklearn.preprocessing import LabelEncoder
 
 logger = logging.getLogger(__name__)
 
-
-def split_data(data_train_enfermedades: pd.DataFrame, parameters: Dict) -> Tuple:
-    """Splits data into features and targets training and test sets.
-
-    Args:
-        data: Data containing features and target.
-        parameters: Parameters defined in parameters/data_science.yml.
-    Returns:
-        Split data.
-    """
-        #
-    #data_train_enfermedades=data_train_enfermedades.drop (['Enfermedad'], axis=1)
-    X=data_train_enfermedades
-    y=data_train_enfermedades["id_Enfermedad"]
+def _aparece_y_como (scoring_enfermedades,id_Sintoma, df_Enfermedades, df_Sintomas,df_EnfeySinto_select):
     
-    X_train, X_test, y_train, y_test = train_test_split(X, y)
-    return X_train, X_test, y_train, y_test
 
-
-def train_model(X_train: pd.DataFrame, y_train: pd.DataFrame, X_test: pd.DataFrame, y_test: pd.Series, parameters: Dict) -> RandomForestClassifier:
-     
-
-     param_grid = { 
-        #'n_estimators': [200, 500],
-        'max_depth' : [10,25, 35],
-       # 'criterion' :['gini', 'entropy']
-     }
-     param_rm = {'criterion': 'entropy',
-        'max_depth': 30,
-        'max_features': 'auto',
-        'n_estimators': 500}
     
-     rf= RandomForestClassifier ()  
-     #rf = lgb.LGBMClassifier()
-
-     #rf = xgb.XGBClassifier()
- 
-     ## Generate model
-     logger.info ("empecé grid")
-     
-
-## Make prediction
-     #new_names = {col: re.sub(r'[^A-Za-z0-9_]+', '', col) for col in X_train.columns}
-     #new_n_list = list(new_names.values())
-# [LightGBM] Feature appears more than one time.
-     #new_names = {col: f'{new_col}_{i}' if new_col in new_n_list[:i] else new_col for i, (col, new_col) in enumerate(new_names.items())}
-     #X_train = X_train.rename(columns=new_names)
-     #le = LabelEncoder()
-     #y_train = le.fit_transform(y_train)
-     rf.fit(X_train, y_train)
-     #logger.info(f'paramma={rf.get_params}')
-
-     #CV_rfc = GridSearchCV(estimator=rf, param_grid=param_grid, cv= 5)
-     #CV_rfc.fit(X_train, y_train)
-     #logger.info(f'Grid={CV_rfc.best_params_}')
-     #logger.info(f'Grid={CV_rfc.best_score_}')
-     #logger.info ("empecé rf")
-     #rf_gscv=RandomForestClassifier(**CV_rfc.best_params_)
-     #rf = LGBMRegressor(**params_lgbm)
-     
-     #rf_gscv.fit(X_train, y_train)
-     logger.info ("terminé  rf")
-     #new_names = {col: re.sub(r'[^A-Za-z0-9_]+', '', col) for col in X_test.columns}
-     #new_n_list = list(new_names.values())
-# [LightGBM] Feature appears more than one time.
-     #new_names = {col: f'{new_col}_{i}' if new_col in new_n_list[:i] else new_col for i, (col, new_col) in enumerate(new_names.items())}
-     #X_test = X_test.rename(columns=new_names)
-     y_pred=rf.predict(X_test)
-    
-     #probs=regressor.predict_proba(X_test)[:, 1]
-     acc = accuracy_score(y_test, y_pred)
-     pres= precision_score (y_test, y_pred, average='micro')
-     f1 = f1_score(y_test, y_pred, average='micro')
-     rec= recall_score (y_test, y_pred, average='micro')
-
-     #auc = roc_auc_score(y_test, probs)
-     logger.info(f'Accurancy={acc}')
-     logger.info(f'Precision={pres}')
-     logger.info(f'F1={f1}')
-     logger.info(f'Recall={rec}')
-     
-
-     return rf
-
+    j=0
+    enfermedades=[]
+    while (j<len(scoring_enfermedades)):
+        enfermedad=[]
+        id_enfermedad=scoring_enfermedades["index"][j]
+        scoring=scoring_enfermedades[id_Sintoma][j]
+        
+        enfermedad.append(id_enfermedad)
+       
+        enfermedad.append(df_Enfermedades[df_Enfermedades["index"]==id_enfermedad]["Enfermedad"].values[0])
    
+        enfermedad.append(scoring)
+        lista=df_EnfeySinto_select[df_EnfeySinto_select["Enfermedad"]==
+                                   df_Enfermedades.loc[id_enfermedad][1]]
+        lista=lista.reset_index()
+        sintoma= df_Sintomas.loc[id_Sintoma].Sintoma
+        
+        i=0
+        while i<len(lista):
+         
+            if lista["Sintoma"][i]==sintoma:
+                enfermedad.append(lista["Frecuencia"][i])
+            
+            i=i+1  
+        j=j+1
+        enfermedades.append(enfermedad)
+        df_enfermedades=pd.DataFrame(enfermedades)
+        
+    return df_enfermedades
 
-def evaluate_model(
-    classificator: RandomForestClassifier, X_test: pd.DataFrame, y_test: pd.Series, parameters: Dict
-):
-    """Calculates and logs the coefficient of determination.
 
-    Args:
-        regressor: Trained model.
-        X_test: Testing data of independent features.
-        y_test: Testing data for price.
-    """
-    y_pred=classificator.predict(X_test)
-    probs=classificator.predict_proba(X_test)[:, 1]
-    
-    acc = accuracy_score(y_test, y_pred)
-    pres= precision_score (y_test, y_pred, average='micro')
-    f1 = f1_score(y_test, y_pred, average='micro')
-    rec= recall_score (y_test, y_pred, average='micro')
-    #auc = roc_auc_score(y_test, probs)
-    logger.info(f'Accurancy={acc}')
-    logger.info(f'Precision={pres}')
-    logger.info(f'Recall={rec}')
-    logger.info(f'F1={f1}')
+
+
+def predict_collaborative_filtering_ser_based(data_matrix: pd.DataFrame, parameters: Dict, 
+                                              csv_sintomas: pd.DataFrame, csv_enfermedades: pd.DataFrame, 
+                                              clean_and_processed_enfermedades: pd.DataFrame):
   
-    #print ("auc: ", auc)
-    #y_pred = regressor.predict(X_test)
-    #score = r2_score(y_test, y_pred)  #Correlacion
-    #logger.info("Model has a coefficient R^2 of %.3f on test data.", score)
-    #logger.info("With LGBMRegressor and parameters %.f max_depth, %.f n_estimators, %.3f learning_rate", parameters["max_depth"], parameters["n_estimators"],parameters["learning_rate"] )
-   
+    sintoma=parameters["sintoma"]
+    elementos=parameters["clasificados"]
+    df_Sintomas=csv_sintomas
+    df_EnfeySinto_select=clean_and_processed_enfermedades
+    df_Enfermedades=csv_enfermedades
+    ratings=data_matrix.values
+    id_sintoma = df_Sintomas[df_Sintomas['Sintoma'] == sintoma].index.values[0]
+
+    ratings_train, ratings_test = train_test_split(ratings, test_size = 0.2, shuffle=False, random_state=42)
+    #print (ratings_train.shape)
+    #print (ratings_test.shape)
+    sim_matrix = 1 - sklearn.metrics.pairwise.cosine_distances(ratings)
+    
+    #Matriz de similitud entre los usuarios (distancia del coseno -vectores-).
+    #Predecir la valoración desconocida de un ítem i para un usuario activo u basandonos en la suma ponderada de
+    #todas las valoraciones del resto de usuarios para dicho ítem.
+    #Recomendaremos los nuevos ítems a los usuarios según lo establecido en los pasos anteriores.
+    #separar las filas y columnas de train y test
+    sim_matrix_train = sim_matrix[0:386,0:386]
+    sim_matrix_test = sim_matrix[386:483,386:483]
+    
+    #users_predictions = sim_matrix_train.dot(ratings_train) / np.array([np.abs(sim_matrix_train).sum(axis=1)]).T
+    users_predictions = sim_matrix.dot(ratings) / np.array([np.abs(sim_matrix).sum(axis=1)]).T
+
+    
+    
+    #Predicciones (las recomendaciones!)
+    
+    user0=users_predictions.argsort()[id_sintoma]
+    vector_id_enfermedad_scoring=[]
+    for i, aRepo in enumerate(user0[-elementos:]):
+        v=[]
+        selRepo = df_Enfermedades[df_Enfermedades["index"]==aRepo]
+  
+       # print('Enfermedad:', selRepo["Enfermedad"] , 'scoring:', users_predictions[sintoma_ver][aRepo])
+        v.append (aRepo)
+        v.append (users_predictions[id_sintoma][aRepo])
+        vector_id_enfermedad_scoring.append(v)
+        
+    vector_id_enfermedad_scoring=pd.DataFrame(vector_id_enfermedad_scoring)
+    vector_id_enfermedad_scoring = vector_id_enfermedad_scoring.rename(columns={1:id_sintoma, 0:"index"})
+    
+    listado_completo=_aparece_y_como (vector_id_enfermedad_scoring,id_sintoma, df_Enfermedades, df_Sintomas,df_EnfeySinto_select)
+    #listado_completo= list(reserved(listado_completo))
+    logger.info(f'Result={listado_completo}')
+    return listado_completo

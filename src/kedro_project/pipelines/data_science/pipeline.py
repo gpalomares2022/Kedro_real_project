@@ -1,29 +1,17 @@
 from kedro.pipeline import Pipeline, node, pipeline
 
 
-from .nodes import evaluate_model,train_model, split_data
+from .nodes import predict_collaborative_filtering_ser_based
 
 
 def create_pipeline(**kwargs) -> Pipeline:
     return pipeline(
         [
             node(
-                func=split_data,
-                inputs=["data_train_enfermedades", "params:model_options"],
-                outputs=["X_train", "X_test", "y_train", "y_test"],
-                name="split_data_node",
-            ),
-            node(
-                func=train_model,
-                inputs=["X_train", "y_train", "X_test", "y_test", "params:model_options"],
-                outputs="classificator",
-                name="train_model_node",
-            ),
-            node(
-                func=evaluate_model,
-                inputs=["classificator", "X_test", "y_test","params:model_options"],
-                outputs=None,
-                name="evaluate_model_node",
+                func=predict_collaborative_filtering_ser_based,
+                inputs=["data_matrix", "params:model_options","csv_sintomas", "csv_enfermedades", "clean_and_processed_enfermedades"],
+                outputs="data_calculated_scoring",
+                name="predict_collaborative_filtering_ser_based_node",
             ),
         ]
     )
