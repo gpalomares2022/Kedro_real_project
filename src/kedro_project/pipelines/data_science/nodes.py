@@ -43,6 +43,7 @@ def _aparece_y_como (scoring_enfermedades,id_Sintoma, df_Enfermedades, df_Sintom
         scoring=scoring_enfermedades[id_Sintoma][j]
         
         enfermedad.append(id_enfermedad)
+        
        
         enfermedad.append(df_Enfermedades[df_Enfermedades["index"]==id_enfermedad]["Enfermedad"].values[0])
    
@@ -51,7 +52,7 @@ def _aparece_y_como (scoring_enfermedades,id_Sintoma, df_Enfermedades, df_Sintom
                                    df_Enfermedades.loc[id_enfermedad][1]]
         lista=lista.reset_index()
         sintoma= df_Sintomas.loc[id_Sintoma].Sintoma
-        
+        enfermedad.append(sintoma)
         i=0
         while i<len(lista):
          
@@ -100,6 +101,20 @@ def _aparece_y_como2 (enfermedades, df_Enfermedades, df_Sintomas,df_EnfeySinto_s
     lista_todo=pd.DataFrame(lista_todo)
         
     return lista_todo
+
+def _prepara_matrix (comunes, enfermedades, sintomas,df_todo,df_matrix):
+
+    resultados=[]
+  #  prueba=pd.DataFrame()
+    #prueba.add
+    
+    comunes=pd.merge(comunes, enfermedades, on='key')
+
+
+
+
+    return resultados
+
 def trata_sintomas2 (parameters: list,df_transpuesta,df_enfermedades,df_sintomas,df_todo):
     comunes=[]
     logger.info(f'Param={parameters}')
@@ -109,6 +124,9 @@ def trata_sintomas2 (parameters: list,df_transpuesta,df_enfermedades,df_sintomas
     primera_iter=True
     df_matrix=df_transpuesta
     lista=[]
+    enfermedades_scoring=[]
+    i=0
+    resuultados=pd.DataFrame()
     for i in sintomas:
         diccionario={
             "sintoma" : i,
@@ -117,13 +135,19 @@ def trata_sintomas2 (parameters: list,df_transpuesta,df_enfermedades,df_sintomas
         vector=[]
         #lista,vector=predict_similitud_entre_usuarios_by_pearson(df_transpuesta,i,20)
         v=predict_collaborative_filtering_ser_based(df_matrix, diccionario,df_sintomas,df_enfermedades,df_todo)
-        logger.info(f'esto?={v}')
+        #logger.info(f'esto?={v}')
  #resul=nodes.predict_collaborative_filtering_ser_based (df_matrix,diccionario,df_sintomas,df_enfermedades,df_todo)
-    
+        print ("empezamos: ", enfermedades_scoring)
+        enfermedades_scoring=pd.DataFrame(enfermedades_scoring)
+        v=pd.DataFrame(v)
+       
+        enfermedades_scoring=pd.concat([enfermedades_scoring,v], axis=0)
+       
         
+        print ("unidad", enfermedades_scoring)
         enfermedades=v[0]
         enfermedades=list(enfermedades)
-        logger.info(f'enfermedades?={enfermedades}')
+       # logger.info(f'enfermedades?={enfermedades}')
       
         if primera_iter:
             comunes=enfermedades
@@ -131,14 +155,37 @@ def trata_sintomas2 (parameters: list,df_transpuesta,df_enfermedades,df_sintomas
 
         else:            
             comunes = set(comunes).intersection(enfermedades)
-        
-        
+          
+        print("comun", comunes)    
+       
+ 
+    
     #enfermedades=_saca_enfermedades(comunes,df_enfermedades)
     enfermedades=_aparece_y_como2 (list(comunes), df_enfermedades, df_sintomas,df_todo)
-    #logger.info(f'enfermeada?={enfermedades}')
-   # print (enfermedades)
+    #logger.info(f'enfermeada comunes?={enfermedades}')
+   # print (enfermedades_scoring[0].values)
+   #enfermedades_scoring=enfermedades.reset_index()
+    if len(enfermedades)>0:
+        print ("Estoy aqui", enfermedades[0])
+  #  enfermedades=list(enfermedades[0])
+        enfermedades_scoring=enfermedades_scoring.reset_index()
+        j=0
+        for i in enfermedades_scoring[0].values:
+            print (i)
+            if (i in enfermedades[0].values):
+                print ("Está: ", i)
+            else:
+                print ("No está ", i)
+                enfermedades_scoring.drop(j, axis=0, inplace=True)
+            j=j+1    
+        
+
+        print ("finish", enfermedades_scoring)
+       # enfermedades_scoring=enfermedades_scoring.drop ("l", axis=1)
+        enfermedades_scoring=enfermedades_scoring.drop ("index", axis=1)
+        enfermedades_scoring=enfermedades_scoring.dropna()
    # enfermedades=pd.DataFrame(enfermedades)
-    return enfermedades
+    return enfermedades_scoring
 
 def predict_collaborative_filtering_ser_based(data_matrix: pd.DataFrame, parameters: Dict, 
                                               csv_sintomas: pd.DataFrame, csv_enfermedades: pd.DataFrame, 
@@ -181,6 +228,7 @@ def predict_collaborative_filtering_ser_based(data_matrix: pd.DataFrame, paramet
        # print('Enfermedad:', selRepo["Enfermedad"] , 'scoring:', users_predictions[sintoma_ver][aRepo])
         v.append (aRepo)
         v.append (users_predictions[id_sintoma][aRepo])
+        v.append (sintoma)
         vector_id_enfermedad_scoring.append(v)
         
     vector_id_enfermedad_scoring=pd.DataFrame(vector_id_enfermedad_scoring)

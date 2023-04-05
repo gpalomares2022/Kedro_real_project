@@ -30,11 +30,11 @@ options = st.multiselect(
 button_press = st.button("Pulsa para comenzar Análisis")
 if button_press:
    
-    st.write('You selected:', options[1])
+   
     sintomas=[]
     for i in options:
         #opciones.append(i)
-        st.write('bucle:', i)
+      
         sintomas.append(i)
 
    #print(options)
@@ -42,7 +42,7 @@ if button_press:
     
 
     #sintomas=parameters["sintomas"]
-    st.write('sintomas:', sintomas)
+  
    # Logger.info(f'sintomas?={}')
     diccionario={
       "sintomas" : sintomas,
@@ -52,7 +52,7 @@ if button_press:
     #def trata_sintomas2 (sintomas,df_transpuesta,df_enfermedades,df_sintomas,df_todo ):
     resul=nodes.trata_sintomas2(diccionario,df_matrix,df_enfermedades,df_sintomas,df_todo)
     #trata_sintomas2 (parameters: Dict,df_transpuesta,df_enfermedades,df_sintomas,df_todo):
-    #resul=resul.drop(0, axis=1)
+    resul=resul.drop(0, axis=1)
     
     
     st.dataframe(resul)

@@ -5,7 +5,7 @@
 # Link: https://kedro.readthedocs.io/en/0.18.5/kedro_project_setup/configuration.html#parameters
 model_options:
   sintoma: "Gastroesophageal reflux"
-  sintomas: ['Dysphagia','Gastroesophageal reflux']
+  sintomas: ['Cough','Dysphagia', 'Weight loss']
   clasificados: 10
   test_size: 0.2
   random_state: 3
