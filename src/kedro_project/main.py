@@ -19,16 +19,17 @@ df_todo=load_from_csv("data/03_primary/sintomas_and_enfermedades_prepaired.csv")
 
 lista=['Gastroesophageal reflux','Dysphagia','Cough','Weight loss']
 df_lista=pd.DataFrame(lista)
+
+
+
+
+
 options = st.multiselect(
-    'Sintoma',
-    df_sintomas,
-    [])
-
-
-
-
+            'Sintoma',
+            df_sintomas,
+            [])
 button_press = st.button("Pulsa para comenzar Análisis")
-if button_press:
+if (button_press):
    
    
     sintomas=[]
@@ -44,19 +45,39 @@ if button_press:
     #sintomas=parameters["sintomas"]
   
    # Logger.info(f'sintomas?={}')
-    diccionario={
-      "sintomas" : sintomas,
-      "clasificados" : 20
-    }
-    resul=[]
+        diccionario={
+                    "sintomas" : sintomas,
+                    "clasificados" : 1000
+        }
+        resul=[]
     #resul=nodes.predict_collaborative_filtering_ser_based (df_matrix,diccionario,df_sintomas,df_enfermedades,df_todo)
     #def trata_sintomas2 (sintomas,df_transpuesta,df_enfermedades,df_sintomas,df_todo ):
-    resul=nodes.trata_sintomas2(diccionario,df_matrix,df_enfermedades,df_sintomas,df_todo)
+        resul,agrup=nodes.trata_sintomas2(diccionario,df_matrix,df_enfermedades,df_sintomas,df_todo)
     #trata_sintomas2 (parameters: Dict,df_transpuesta,df_enfermedades,df_sintomas,df_todo):
     #if len(resul)>0:
        # resul=resul.drop(0, axis=1)
-    st.dataframe(resul)
     
+   # button_press_agrupado = st.button("Agrupado")
+    
+
+
+    
+      
+   
+
+# Using "with" notation
+#add_radio = st.radio(
+ #       "Choose a shipping method",
+  #      ("Sin agrupar", "Agrupado")
+#)
+      #  button_press = st.button("Cambiar")        
+    
+  
+    st.dataframe(resul)
+   
+    st.dataframe(agrup)
         
+
+    
    
 

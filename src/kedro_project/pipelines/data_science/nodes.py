@@ -23,13 +23,28 @@ from sklearn.preprocessing import LabelEncoder
 
 logger = logging.getLogger(__name__)
 
-def _saca_enfermedades (vector,df_Enfermedades):
+def _contar(data):
+
+    result = {}
+    for item in data:
+        if item not in result.keys():
+            result[item] = 1
+        else:
+            result[item] += 1
+    #result = {'a': 'Apple', 'b': 'Banana', 'c': 'Cherries', 'd': 'Dragon Fruit'}
+
+    myList = zip(result.keys(), result.values()) 
+
+    myList = list(myList)   
+    return myList
+
+# def _saca_enfermedades (vector,df_Enfermedades):
     
-    enfermedades=[]
-    for j in vector:
-        enfermedades.append(df_Enfermedades[df_Enfermedades["index"]==j]["Enfermedad"])
+#     enfermedades=[]
+#     for j in vector:
+#         enfermedades.append(df_Enfermedades[df_Enfermedades["index"]==j]["Enfermedad"])
         
-    return enfermedades
+#     return enfermedades
 
 def _aparece_y_como (scoring_enfermedades,id_Sintoma, df_Enfermedades, df_Sintomas,df_EnfeySinto_select):
     
@@ -66,54 +81,54 @@ def _aparece_y_como (scoring_enfermedades,id_Sintoma, df_Enfermedades, df_Sintom
         
     return df_enfermedades
 
-def _aparece_y_como2 (enfermedades, df_Enfermedades, df_Sintomas,df_EnfeySinto_select):
+# def _aparece_y_como2 (enfermedades, df_Enfermedades, df_Sintomas,df_EnfeySinto_select):
     
 
     
-    j=0
-    lista_todo=[]
-    df_enfermedades=pd.DataFrame()
-    while (j<len(enfermedades)):
-        enfermedad=[]
-        id_enfermedad=enfermedades[j]
-        #scoring=scoring_enfermedades[id_Sintoma][j]
+#     j=0
+#     lista_todo=[]
+#     df_enfermedades=pd.DataFrame()
+#     while (j<len(enfermedades)):
+#         enfermedad=[]
+#         id_enfermedad=enfermedades[j]
+#         #scoring=scoring_enfermedades[id_Sintoma][j]
         
-        enfermedad.append(id_enfermedad)
+#         enfermedad.append(id_enfermedad)
        
-        enfermedad.append(df_Enfermedades[df_Enfermedades["index"]==id_enfermedad]["Enfermedad"].values[0])
+#         enfermedad.append(df_Enfermedades[df_Enfermedades["index"]==id_enfermedad]["Enfermedad"].values[0])
    
-       # enfermedad.append(scoring)
-        #lista=df_EnfeySinto_select[df_EnfeySinto_select["Enfermedad"]==
-         #                          df_Enfermedades.loc[id_enfermedad][1]]
-        #lista=lista.reset_index()
-        #sintoma= df_Sintomas.loc[id_Sintoma].Sintoma
+#        # enfermedad.append(scoring)
+#         #lista=df_EnfeySinto_select[df_EnfeySinto_select["Enfermedad"]==
+#          #                          df_Enfermedades.loc[id_enfermedad][1]]
+#         #lista=lista.reset_index()
+#         #sintoma= df_Sintomas.loc[id_Sintoma].Sintoma
         
-        #i=0
-        #while i<len(lista):
+#         #i=0
+#         #while i<len(lista):
          
-         #   if lista["Sintoma"][i]==sintoma:
-          #      enfermedad.append(lista["Frecuencia"][i])
+#          #   if lista["Sintoma"][i]==sintoma:
+#           #      enfermedad.append(lista["Frecuencia"][i])
             
-           # i=i+1  
-        #j=j+1
-        lista_todo.append(enfermedad)
-        j=j+1
-    lista_todo=pd.DataFrame(lista_todo)
+#            # i=i+1  
+#         #j=j+1
+#         lista_todo.append(enfermedad)
+#         j=j+1
+#     lista_todo=pd.DataFrame(lista_todo)
         
-    return lista_todo
+#     return lista_todo
 
-def _prepara_matrix (comunes, enfermedades, sintomas,df_todo,df_matrix):
+# def _prepara_matrix (comunes, enfermedades, sintomas,df_todo,df_matrix):
 
-    resultados=[]
-  #  prueba=pd.DataFrame()
-    #prueba.add
+#     resultados=[]
+#   #  prueba=pd.DataFrame()
+#     #prueba.add
     
-    comunes=pd.merge(comunes, enfermedades, on='key')
+#     comunes=pd.merge(comunes, enfermedades, on='key')
 
 
 
 
-    return resultados
+#     return resultados
 
 def trata_sintomas2 (parameters: list,df_transpuesta,df_enfermedades,df_sintomas,df_todo):
     comunes=[]
@@ -134,7 +149,7 @@ def trata_sintomas2 (parameters: list,df_transpuesta,df_enfermedades,df_sintomas
     for i in sintomas:
         diccionario={
             "sintoma" : i,
-            "clasificados" : 1000
+            "clasificados" : clasificados
         }
         vector=[]
         #lista,vector=predict_similitud_entre_usuarios_by_pearson(df_transpuesta,i,20)
@@ -203,31 +218,23 @@ def trata_sintomas2 (parameters: list,df_transpuesta,df_enfermedades,df_sintomas
 
         enfermedades_scoring=enfermedades_scoring.drop (0, axis=1)
         enfermedades_scoring=enfermedades_scoring.drop ("index", axis=1)
+        enfermedades_scoring=enfermedades_scoring.sort_values(by="Scoring", ascending=False)
+        data_agrupado = (enfermedades_scoring.groupby("Enfermedad")
+         .agg({"Frecuencia": np.array, "Scoring": np.array})
+         .reset_index()
+         )
+        print (enfermedades_scoring)
         
    # enfermedades=pd.DataFrame(enfermedades)
     else:
         enfermedades_scoring=pd.DataFrame()
+        data_agrupado=pd.DataFrame()
 
-    enfermedades_scoring=enfermedades_scoring.sort_values(by="Scoring", ascending=False)
     
-    print (enfermedades_scoring)
-    return  enfermedades_scoring.head(50)
+    return  enfermedades_scoring.head(50), data_agrupado
     
 
-def _contar(data):
 
-    result = {}
-    for item in data:
-        if item not in result.keys():
-            result[item] = 1
-        else:
-            result[item] += 1
-    #result = {'a': 'Apple', 'b': 'Banana', 'c': 'Cherries', 'd': 'Dragon Fruit'}
-
-    myList = zip(result.keys(), result.values()) 
-
-    myList = list(myList)   
-    return myList
 
 def predict_collaborative_filtering_ser_based(data_matrix: pd.DataFrame, parameters: Dict, 
                                               csv_sintomas: pd.DataFrame, csv_enfermedades: pd.DataFrame, 

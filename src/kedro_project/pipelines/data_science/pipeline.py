@@ -16,7 +16,7 @@ def create_pipeline(**kwargs) -> Pipeline:
             node(
                 func=trata_sintomas2,
                 inputs=["params:model_options","data_matrix","csv_enfermedades","csv_sintomas","clean_and_processed_enfermedades"],
-                outputs="data_calculated_multi_scoring",
+                outputs=["data_calculated_multi_scoring","data_calculated_multi_scoring_agrup"],
                 name="trata_sintomas2_node",
             ),
 
