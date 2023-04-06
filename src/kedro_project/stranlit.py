@@ -46,15 +46,17 @@ if button_press:
    # Logger.info(f'sintomas?={}')
     diccionario={
       "sintomas" : sintomas,
-      "clasificados" : 10
+      "clasificados" : 20
     }
+    resul=[]
     #resul=nodes.predict_collaborative_filtering_ser_based (df_matrix,diccionario,df_sintomas,df_enfermedades,df_todo)
     #def trata_sintomas2 (sintomas,df_transpuesta,df_enfermedades,df_sintomas,df_todo ):
     resul=nodes.trata_sintomas2(diccionario,df_matrix,df_enfermedades,df_sintomas,df_todo)
     #trata_sintomas2 (parameters: Dict,df_transpuesta,df_enfermedades,df_sintomas,df_todo):
-    resul=resul.drop(0, axis=1)
-    
-    
+    #if len(resul)>0:
+       # resul=resul.drop(0, axis=1)
     st.dataframe(resul)
+    
+        
    
 
