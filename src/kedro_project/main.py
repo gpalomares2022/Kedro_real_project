@@ -17,8 +17,7 @@ df_enfermedades= load_from_csv("data/01_raw/enfermedades.csv")
 df_sintomas= load_from_csv("data/01_raw/sintomas.csv")
 df_todo=load_from_csv("data/03_primary/sintomas_and_enfermedades_prepaired.csv")
 
-lista=['Gastroesophageal reflux','Dysphagia','Cough','Weight loss']
-df_lista=pd.DataFrame(lista)
+
 
 
 
@@ -47,12 +46,12 @@ if (button_press):
    # Logger.info(f'sintomas?={}')
         diccionario={
                     "sintomas" : sintomas,
-                    "clasificados" : 1000
+                    "clasificados" : 500
         }
         resul=[]
     #resul=nodes.predict_collaborative_filtering_ser_based (df_matrix,diccionario,df_sintomas,df_enfermedades,df_todo)
     #def trata_sintomas2 (sintomas,df_transpuesta,df_enfermedades,df_sintomas,df_todo ):
-        resul,agrup=nodes.trata_sintomas2(diccionario,df_matrix,df_enfermedades,df_sintomas,df_todo)
+        resul,agrup,sumas=nodes.trata_sintomas_copy(diccionario,df_matrix,df_enfermedades,df_sintomas,df_todo)
     #trata_sintomas2 (parameters: Dict,df_transpuesta,df_enfermedades,df_sintomas,df_todo):
     #if len(resul)>0:
        # resul=resul.drop(0, axis=1)
@@ -73,9 +72,12 @@ if (button_press):
       #  button_press = st.button("Cambiar")        
     
   
-    st.dataframe(resul)
+    #st.dataframe(resul)
    
-    st.dataframe(agrup)
+    #st.dataframe(agrup)
+    st.dataframe(sumas,1800,600)
+    st.write(sumas)
+
         
 
     

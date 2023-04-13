@@ -1,4 +1,5 @@
 import logging
+import sqlite3
 from typing import Dict, Tuple
 from git import List
 import pandas as pd
@@ -146,6 +147,10 @@ def trata_sintomas2 (parameters: list,df_transpuesta,df_enfermedades,df_sintomas
     enfermedades=[]
     i=0
     resuultados=pd.DataFrame()
+
+    init_collaborative_filtering_user_based (df_matrix.values)
+    
+    
     for i in sintomas:
         diccionario={
             "sintoma" : i,
@@ -153,7 +158,7 @@ def trata_sintomas2 (parameters: list,df_transpuesta,df_enfermedades,df_sintomas
         }
         vector=[]
         #lista,vector=predict_similitud_entre_usuarios_by_pearson(df_transpuesta,i,20)
-        v=predict_collaborative_filtering_ser_based(df_matrix, diccionario,df_sintomas,df_enfermedades,df_todo)
+        v=predict_collaborative_filtering_ser_based(diccionario,df_sintomas,df_enfermedades,df_todo)
         #logger.info(f'esto?={v}')
  #resul=nodes.predict_collaborative_filtering_ser_based (df_matrix,diccionario,df_sintomas,df_enfermedades,df_todo)
      #   print ("empezamos: ", enfermedades_scoring)
@@ -166,16 +171,16 @@ def trata_sintomas2 (parameters: list,df_transpuesta,df_enfermedades,df_sintomas
        
         #PROCESO DE SACAR EL LISTADO DEFINITVO DE IDS DE ENFERMEDADES QUE SON COMUNES
       #  print ("unidad", enfermedades_scoring)
-        enfermedades=v[0]
-        enfermedades=list(enfermedades)
+        #enfermedades=v[0]
+        #enfermedades=list(enfermedades)
        # logger.info(f'enfermedades?={enfermedades}')
       
-        if primera_iter:
-            comunes=enfermedades
-            primera_iter=False
+        #if primera_iter:
+         #   comunes=enfermedades
+          #  primera_iter=False
 
-        else:            
-            comunes = set(comunes).intersection(enfermedades)
+        #else:            
+         #   comunes = set(comunes).intersection(enfermedades)
           
        # print("comun", comunes)    
        
@@ -223,7 +228,7 @@ def trata_sintomas2 (parameters: list,df_transpuesta,df_enfermedades,df_sintomas
          .agg({"Frecuencia": np.array, "Scoring": np.array})
          .reset_index()
          )
-        print (enfermedades_scoring)
+       # print (enfermedades_scoring)
         
    # enfermedades=pd.DataFrame(enfermedades)
     else:
@@ -234,9 +239,143 @@ def trata_sintomas2 (parameters: list,df_transpuesta,df_enfermedades,df_sintomas
     return  enfermedades_scoring.head(50), data_agrupado
     
 
+def trata_sintomas_copy (parameters: list,df_transpuesta,df_enfermedades,df_sintomas,df_todo):
+    comunes=[]
+    logger.info(f'Param={parameters}')
+    logger.info(f'sintomas?={parameters["sintomas"]}')
+    sintomas=parameters["sintomas"]
+    logger.info(f'Sintomas={sintomas}')
+    clasificados=parameters["clasificados"]
+    logger.info(f'Clasificados={clasificados}')
+    primera_iter=True
+    df_matrix=df_transpuesta
+    lista=[]
+    enfermedades_scoring=[]
+    enfermedades_scoring=pd.DataFrame(enfermedades_scoring)
+    enfermedades=[]
+    i=0
+    resuultados=pd.DataFrame()
+    print("número:", clasificados)
+    init_collaborative_filtering_user_based (df_matrix.values)
+    
+    
+    for i in sintomas:
+        diccionario={
+            "sintoma" : i,
+            "clasificados" : clasificados
+        }
+        vector=[]
+        #lista,vector=predict_similitud_entre_usuarios_by_pearson(df_transpuesta,i,20)
+        v=predict_collaborative_filtering_ser_based(diccionario,df_sintomas,df_enfermedades,df_todo)
+      
+        
+        v=pd.DataFrame(v)
+        V=v.dropna()
+        #EN ENFERMEDADES SCORING VAMOS COGIENDO LOS X ENFERMEDADES POR CADA SINTOMA. NO FILTRAMOS... SOLO RECOPILAMOS CON CONCAT EN BUCLE
+        enfermedades_scoring=pd.concat([enfermedades_scoring,v], axis=0)
+        enfermedades_scoring=enfermedades_scoring.dropna()
+        
+    print("TODAS: ", enfermedades_scoring)
+   #DE TODO EL LISTADO GRANDE QUE HEMOS SACADO, FILTRAMOS QUITANDO LOS QUE NO ESTÉN EN LA LISTA DE COMUNES
+    if len(enfermedades_scoring)>0:
+     
+       # enfermedades_scoring=enfermedades_scoring.sort_values(by="Scoring", ascending=False)
+
+        data_agrupado = (enfermedades_scoring.groupby("Enfermedad")
+         .agg({"Frecuencia": np.array, "Scoring": np.double, "Síntomas": np.array})
+         .reset_index()
+         )
+        #print(data_agrupado.shape)
+        enfermedades_suma=[]
+        #print("tamaño: ", len(data_agrupado))
+        #print ("cuantos ", data.shape)
+        i=0
+        
+        
+        while (i<len(data_agrupado)):
+             enfermedad_suma=[]
+             enfermedad_suma.append (data_agrupado["Enfermedad"][i])
+             #print("scoringss", data_agrupado["Scoring"])
+
+             sintomas_para_sumar=data_agrupado["Scoring"][i]
+             nombre_sintoma=data_agrupado["Síntomas"][i]
+             
+             #sintomas_para_sumar=(data_agrupado["Scoring"][i])
+             agrupado_nombre_sintoma=[]
+             if (type(sintomas_para_sumar)==np.float64):
+                #print("ok")
+                g=[]
+                total=round(sintomas_para_sumar,3)
+                g.append(nombre_sintoma[0] + " ("+ str(total) + ")")
+                num_sintomas=1
+
+              #  agrupado_nombre_sintoma.append( nombre_sintoma + " ("+ str(total) +")")
+             else:
+                 j=0
+                 total=0
+                 num_sintomas=len(sintomas_para_sumar)
+                 g=[]
+                 while (j<num_sintomas):
+                     print("sin: ", sintomas_para_sumar[j])
+                     valor= round(sintomas_para_sumar[j],3)
+
+                     g.append(nombre_sintoma[j] + " ("+ str(valor) + ")")
+                    # agrupado_nombre_sintoma.append(
+                     total=sintomas_para_sumar[j]+total
+                     j=j+1
+                 
+             
+             enfermedad_suma.append(g)
+             enfermedad_suma.append(total)
+                # print (total)
+             
+             
+             enfermedades_suma.append(enfermedad_suma)
+            
+             i=i+1
+      
+        df_enfermedades_suma=pd.DataFrame (enfermedades_suma)
+        df_enfermedades_suma = df_enfermedades_suma.rename(columns={1:"Síntomas", 0:"Enfermedad", 2:"Scoring"})
+        df_enfermedades_suma=df_enfermedades_suma.sort_values(by="Scoring", ascending=False)
+        df_enfermedades_suma=df_enfermedades_suma.reset_index()
+        df_enfermedades_suma.drop("index", axis=1, inplace=True)
+        #enfermedades_suma=enfermedades_suma.sort()
+        print(df_enfermedades_suma)
+   # enfermedades=pd.DataFrame(enfermedades)
+    else:
+        enfermedades_scoring=pd.DataFrame()
+        data_agrupado=pd.DataFrame()
+        df_enfermedades_suma=pd.DataFrame()
+
+    #print (enfermedades_scoring)
+ 
+    return  enfermedades_scoring.head(50), data_agrupado, df_enfermedades_suma
 
 
-def predict_collaborative_filtering_ser_based(data_matrix: pd.DataFrame, parameters: Dict, 
+
+
+
+def init_collaborative_filtering_user_based (ratings):
+    
+    #sim_matrix = 1 - sklearn.metrics.pairwise.cosine_distances(ratings)
+    sim_matrix= sklearn.metrics.pairwise.cosine_similarity(ratings)
+    sintomas_k = sim_matrix.dot(ratings) / np.array([np.abs(sim_matrix).sum(axis=1)]).T
+    #print(sintomas_k)
+
+
+    conn = sqlite3.connect('test_database')
+    c = conn.cursor()
+
+
+    df = pd.DataFrame(sintomas_k)
+    df=df.transpose()
+    df.to_sql('scorings_tfm_kedro', conn, if_exists='replace', index = False)
+
+
+
+
+
+def predict_collaborative_filtering_ser_based( parameters: Dict, 
                                               csv_sintomas: pd.DataFrame, csv_enfermedades: pd.DataFrame, 
                                               clean_and_processed_enfermedades: pd.DataFrame):
   
@@ -245,30 +384,24 @@ def predict_collaborative_filtering_ser_based(data_matrix: pd.DataFrame, paramet
     df_Sintomas=csv_sintomas
     df_EnfeySinto_select=clean_and_processed_enfermedades
     df_Enfermedades=csv_enfermedades
-    ratings=data_matrix.values
+    #ratings=data_matrix.values
     id_sintoma = df_Sintomas[df_Sintomas['Sintoma'] == sintoma].index.values[0]
 
-    ratings_train, ratings_test = train_test_split(ratings, test_size = 0.2, shuffle=False, random_state=42)
-    #print (ratings_train.shape)
-    #print (ratings_test.shape)
-    sim_matrix = 1 - sklearn.metrics.pairwise.cosine_distances(ratings)
-    
-    #Matriz de similitud entre los usuarios (distancia del coseno -vectores-).
-    #Predecir la valoración desconocida de un ítem i para un usuario activo u basandonos en la suma ponderada de
-    #todas las valoraciones del resto de usuarios para dicho ítem.
-    #Recomendaremos los nuevos ítems a los usuarios según lo establecido en los pasos anteriores.
-    #separar las filas y columnas de train y test
-    sim_matrix_train = sim_matrix[0:386,0:386]
-    sim_matrix_test = sim_matrix[386:483,386:483]
-    
-    #users_predictions = sim_matrix_train.dot(ratings_train) / np.array([np.abs(sim_matrix_train).sum(axis=1)]).T
-    users_predictions = sim_matrix.dot(ratings) / np.array([np.abs(sim_matrix).sum(axis=1)]).T
 
+    conn = sqlite3.connect('test_database')
+    c = conn.cursor()
+    c.execute('''  SELECT * FROM scorings_tfm_kedro
+          ''')
+    #Predicciones (las recomendaciones!)
+    sintomas_k = pd.DataFrame(c.fetchall())  
+    sintomas_k=sintomas_k.transpose()
+    #print (sintomas_k)
+    sintomas_k=sintomas_k.to_numpy()
     
     
     #Predicciones (las recomendaciones!)
     
-    user0=users_predictions.argsort()[id_sintoma]
+    user0=sintomas_k.argsort()[id_sintoma]
     vector_id_enfermedad_scoring=[]
     for i, aRepo in enumerate(user0[-elementos:]):
         v=[]
@@ -276,7 +409,7 @@ def predict_collaborative_filtering_ser_based(data_matrix: pd.DataFrame, paramet
   
        # print('Enfermedad:', selRepo["Enfermedad"] , 'scoring:', users_predictions[sintoma_ver][aRepo])
         v.append (aRepo)
-        v.append (users_predictions[id_sintoma][aRepo])
+        v.append (sintomas_k[id_sintoma][aRepo])
         v.append (sintoma)
         vector_id_enfermedad_scoring.append(v)
         
