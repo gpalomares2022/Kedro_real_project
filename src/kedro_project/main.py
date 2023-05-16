@@ -46,7 +46,7 @@ if (button_press):
    # Logger.info(f'sintomas?={}')
         diccionario={
                     "sintomas" : sintomas,
-                    "clasificados" : 500
+                    "clasificados" : 1000
         }
         resul=[]
     #resul=nodes.predict_collaborative_filtering_ser_based (df_matrix,diccionario,df_sintomas,df_enfermedades,df_todo)
