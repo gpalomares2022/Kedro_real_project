@@ -39,7 +39,13 @@ def _contar(data):
     myList = list(myList)   
     return myList
 
-
+# def _saca_enfermedades (vector,df_Enfermedades):
+    
+#     enfermedades=[]
+#     for j in vector:
+#         enfermedades.append(df_Enfermedades[df_Enfermedades["index"]==j]["Enfermedad"])
+        
+#     return enfermedades
 
 def _aparece_y_como (scoring_enfermedades,id_Sintoma, df_Enfermedades, df_Sintomas,df_EnfeySinto_select):
     
@@ -125,7 +131,112 @@ def _aparece_y_como (scoring_enfermedades,id_Sintoma, df_Enfermedades, df_Sintom
 
 #     return resultados
 
+def trata_sintomas2 (parameters: list,df_transpuesta,df_enfermedades,df_sintomas,df_todo):
+    comunes=[]
+    logger.info(f'Param={parameters}')
+    logger.info(f'sintomas?={parameters["sintomas"]}')
+    sintomas=parameters["sintomas"]
+    logger.info(f'Sintomas={sintomas}')
+    clasificados=parameters["clasificados"]
+    logger.info(f'Clasificados={clasificados}')
+    primera_iter=True
+    df_matrix=df_transpuesta
+    lista=[]
+    enfermedades_scoring=[]
+    enfermedades_scoring=pd.DataFrame(enfermedades_scoring)
+    enfermedades=[]
+    i=0
+    resuultados=pd.DataFrame()
 
+    init_collaborative_filtering_user_based (df_matrix.values)
+    
+    
+    for i in sintomas:
+        diccionario={
+            "sintoma" : i,
+            "clasificados" : clasificados
+        }
+        vector=[]
+        #lista,vector=predict_similitud_entre_usuarios_by_pearson(df_transpuesta,i,20)
+        v=predict_collaborative_filtering_ser_based(diccionario,df_sintomas,df_enfermedades,df_todo)
+        #logger.info(f'esto?={v}')
+ #resul=nodes.predict_collaborative_filtering_ser_based (df_matrix,diccionario,df_sintomas,df_enfermedades,df_todo)
+     #   print ("empezamos: ", enfermedades_scoring)
+        #print("lo que sale v:", v)
+        
+        v=pd.DataFrame(v)
+        V=v.dropna()
+        #EN ENFERMEDADES SCORING VAMOS COGIENDO LOS X ENFERMEDADES POR CADA SINTOMA. NO FILTRAMOS... SOLO RECOPILAMOS CON CONCAT EN BUCLE
+        enfermedades_scoring=pd.concat([enfermedades_scoring,v], axis=0)
+       
+        #PROCESO DE SACAR EL LISTADO DEFINITVO DE IDS DE ENFERMEDADES QUE SON COMUNES
+      #  print ("unidad", enfermedades_scoring)
+        #enfermedades=v[0]
+        #enfermedades=list(enfermedades)
+       # logger.info(f'enfermedades?={enfermedades}')
+      
+        #if primera_iter:
+         #   comunes=enfermedades
+          #  primera_iter=False
+
+        #else:            
+         #   comunes = set(comunes).intersection(enfermedades)
+          
+       # print("comun", comunes)    
+       
+ 
+    
+    #enfermedades=_saca_enfermedades(comunes,df_enfermedades)
+   # print("aqui entra")
+    #enfermedades=v
+    #_aparece_y_como2 (list(comunes), df_enfermedades, df_sintomas,df_todo)
+    #logger.info(f'enfermeada comunes?={enfermedades}')
+   # print (enfermedades_scoring[0].values)
+   #enfermedades_scoring=enfermedades.reset_index()
+    df_comunes=pd.DataFrame(comunes)
+
+   #DE TODO EL LISTADO GRANDE QUE HEMOS SACADO, FILTRAMOS QUITANDO LOS QUE NO ESTÉN EN LA LISTA DE COMUNES
+    if len(comunes)>0:
+      #  print ("Estoy aqui", enfermedades[0])
+  #  enfermedades=list(enfermedades[0])
+        enfermedades_scoring=enfermedades_scoring.dropna()
+        enfermedades_scoring=enfermedades_scoring.reset_index()
+        j=0
+        for i in enfermedades_scoring[0].values:
+            
+            if (i not in df_comunes.values):
+                #print ("borramos: ", enfermedades_scoring[0][j])
+
+                enfermedades_scoring.drop(j, axis=0, inplace=True)
+                #enfermedades_scoring=enfermedades_scoring[enfermedades_scoring[0]!=i]
+                
+                
+            j=j+1    
+            
+        b=_contar(enfermedades_scoring["Enfermedad"])
+        for i in b:
+           # print (i[1])
+            if i[1]!=len(sintomas):
+                #print ("len : ", len(sintomas))
+                #print ("tama : ", i[1])
+                enfermedades_scoring=enfermedades_scoring[enfermedades_scoring["Enfermedad"]!=i[0]]
+
+        enfermedades_scoring=enfermedades_scoring.drop (0, axis=1)
+        enfermedades_scoring=enfermedades_scoring.drop ("index", axis=1)
+        enfermedades_scoring=enfermedades_scoring.sort_values(by="Scoring", ascending=False)
+        data_agrupado = (enfermedades_scoring.groupby("Enfermedad")
+         .agg({"Frecuencia": np.array, "Scoring": np.array})
+         .reset_index()
+         )
+       # print (enfermedades_scoring)
+        
+   # enfermedades=pd.DataFrame(enfermedades)
+    else:
+        enfermedades_scoring=pd.DataFrame()
+        data_agrupado=pd.DataFrame()
+
+    
+    return  enfermedades_scoring.head(50), data_agrupado
     
 
 def trata_sintomas_copy (parameters: list,df_transpuesta,df_enfermedades,df_sintomas,df_todo):
