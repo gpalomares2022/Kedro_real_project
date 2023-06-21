@@ -76,7 +76,7 @@ if (button_press):
    
     #st.dataframe(agrup)
     st.dataframe(sumas,1800,600)
-    st.write(sumas)
+    #st.write(sumas)
 
         
 
