@@ -98,12 +98,13 @@ def clean_selection_and_preparation_data(csv_enfermedades: pd.DataFrame):
             data.drop(b , inplace=True, axis=0)
     numero=float(data["Enfermedad"].nunique())
 
-    logger.info ("Inicial")
+    logger.info ("Voy a ir a por frecuencias")
         #logger.info ("Enfermedades: ", format(numero))
     logger.info(f'Enfermedades={numero}')
       
     logger.info(f'Sintomas={data["Sintoma"].nunique()}')
     logger.info(f'Frecuencias={data["Frecuencia"].nunique()}')
+    logger.info (data.head)
     data=data[(data['Frecuencia']=="Muy frecuente (99-80%)") |
               (data['Frecuencia']=="Frecuente (79-30%)") |
               (data['Frecuencia']=="Obligatorio (100%)") |
@@ -112,7 +113,8 @@ def clean_selection_and_preparation_data(csv_enfermedades: pd.DataFrame):
              ] 
     numero=float(data["Enfermedad"].nunique())
 
-    logger.info ("Inicial")
+    logger.info ("Inicial final")
+    logger.info (data.shape)
         #logger.info ("Enfermedades: ", format(numero))
     logger.info(f'Enfermedades={numero}')
       

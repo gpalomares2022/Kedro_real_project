@@ -7,13 +7,13 @@ import sklearn
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import r2_score
 from sklearn.model_selection import train_test_split
-from lightgbm import LGBMRegressor
+
 from sklearn.metrics import f1_score, accuracy_score, roc_auc_score, roc_curve, precision_score, recall_score
 from sklearn.model_selection import GridSearchCV
 from sklearn.multioutput import MultiOutputClassifier
 import numpy as np
 import xgboost as xgb
-import lightgbm as lgb
+
 import re
 from sklearn.preprocessing import LabelEncoder
 
