@@ -2,18 +2,21 @@
 This is a boilerplate pipeline 'data_processing'
 generated using Kedro 0.18.5
 """
+
 import pandas as pd
+import sklearn.metrics
 import xmltodict
-from typing import Dict, Tuple
+from typing import Dict
 import logging
 import numpy as np
-import random
+
 import warnings
 
 
 logger = logging.getLogger(__name__)
 warnings.filterwarnings("ignore")
 
+#Función interna para cambiar los nombres de las columnas en una matriz por su propia posición de columna (cambia a número de pos).
 def _cambiar_columnas(df):
     
     columnas=len(df.columns)
@@ -25,6 +28,7 @@ def _cambiar_columnas(df):
         
     return df
 
+#Función interna para hacer sustituciones de una cadena, y sea más fácil de trabajar el XML
 def _limpia_nombre (cadena):
     
     cadena_str= str(cadena)
@@ -34,6 +38,9 @@ def _limpia_nombre (cadena):
     
     return cadena_str
 
+#------------------------------------------------------------------------------------------------------#
+
+#Función primera del pipeline procesamiento de datos.  Se encarga de coger el XML y cargar la información de enfermedades-sintomas-frecuencias
 def import_enfermedades_xml(parameters: Dict):
 
     xml=open(parameters["path"], encoding='ISO-8859-1')
@@ -67,29 +74,28 @@ def import_enfermedades_xml(parameters: Dict):
     df_enfermedades = df_enfermedades.rename(columns={0:'Enfermedad',1:'Id_Enfermedad', 2:'Sintoma', 3:"Frecuencia"})
     return df_enfermedades
 
+#------------------------------------------------------------------------------------------------------#
+
+#Función segunda del pipeline procesamiento de datos. Se encarga de aplicar EDA sobre el CSV disponible tras la lectura del XML.
+
 def clean_selection_and_preparation_data(csv_enfermedades: pd.DataFrame): 
         
 
     data=csv_enfermedades
     numero=float(data["Enfermedad"].nunique())
 
-    logger.info ("Inicial")
-        #logger.info ("Enfermedades: ", format(numero))
+    logger.info ("Inicial antes de EDA")
     logger.info(f'Enfermedades={numero}')
       
     logger.info(f'Sintomas={data["Sintoma"].nunique()}')
     logger.info(f'Frecuencias={data["Frecuencia"].nunique()}')
     data=data.drop_duplicates()
 
+    #Hacemos limpieza de nulos
     data=data.dropna()
     numero=float(data["Enfermedad"].nunique())
 
-    logger.info ("Inicial")
-        #logger.info ("Enfermedades: ", format(numero))
-    logger.info(f'Enfermedades={numero}')
-      
-    logger.info(f'Sintomas={data["Sintoma"].nunique()}')
-    logger.info(f'Frecuencias={data["Frecuencia"].nunique()}')
+    #Nos quedamos con los sintomas que aparezcan más de 50 veces en enfermedades. Si no, eliminamos.
     vc = data["Sintoma"].value_counts()
     vector=vc[vc < 50].index
     for a in vector:
@@ -98,13 +104,7 @@ def clean_selection_and_preparation_data(csv_enfermedades: pd.DataFrame):
             data.drop(b , inplace=True, axis=0)
     numero=float(data["Enfermedad"].nunique())
 
-    logger.info ("Voy a ir a por frecuencias")
-        #logger.info ("Enfermedades: ", format(numero))
-    logger.info(f'Enfermedades={numero}')
-      
-    logger.info(f'Sintomas={data["Sintoma"].nunique()}')
-    logger.info(f'Frecuencias={data["Frecuencia"].nunique()}')
-    logger.info (data.head)
+    #Nos quedamos con los registros que sólo tengan estas frecuencias. El resto eliminamos.
     data=data[(data['Frecuencia']=="Muy frecuente (99-80%)") |
               (data['Frecuencia']=="Frecuente (79-30%)") |
               (data['Frecuencia']=="Obligatorio (100%)") |
@@ -113,9 +113,8 @@ def clean_selection_and_preparation_data(csv_enfermedades: pd.DataFrame):
              ] 
     numero=float(data["Enfermedad"].nunique())
 
-    logger.info ("Inicial final")
-    logger.info (data.shape)
-        #logger.info ("Enfermedades: ", format(numero))
+    logger.info ("Final después de EDA")
+   
     logger.info(f'Enfermedades={numero}')
       
     logger.info(f'Sintomas={data["Sintoma"].nunique()}')
@@ -126,25 +125,11 @@ def clean_selection_and_preparation_data(csv_enfermedades: pd.DataFrame):
 
     return data
 
-def generate_data_enfermedades (clean_and_processed_enfermedades: pd.DataFrame):
+#------------------------------------------------------------------------------------------------------#
 
-    data=clean_and_processed_enfermedades
-    df_Enfermedades=data.groupby (["Enfermedad"]).count().reset_index()
-    df_Enfermedades=df_Enfermedades.drop(["Sintoma","Frecuencia"], axis=1)
-    df_Enfermedades=df_Enfermedades.reset_index()
-
-    return df_Enfermedades
-
-def generate_data_sintomas (clean_and_processed_enfermedades: pd.DataFrame):
-
-    data=clean_and_processed_enfermedades
-    df_Sintomas=data.groupby (["Sintoma"]).count().reset_index()
-    df_Sintomas=df_Sintomas.drop(["Enfermedad","Frecuencia"], axis=1)
-
-    return df_Sintomas
-
-
-def generate_data_matrix (clean_and_processed_enfermedades: pd.DataFrame):
+#Función tercera del pipeline procesamiento de datos. Se encarga de calcular los ratings o scoring de relación entre enfermedades
+#y síntomas. En función de la frecuencia dará un valor de 1,2,3, o 4
+def generate_data_scoring (clean_and_processed_enfermedades: pd.DataFrame):
     
     data=clean_and_processed_enfermedades
     sintomas=data.iloc[:,1]
@@ -152,8 +137,7 @@ def generate_data_matrix (clean_and_processed_enfermedades: pd.DataFrame):
     sintomas_sin_repe=sintomas_sin_repe.sort_values(ascending
                               = True)
     df_train=pd.DataFrame(columns=sintomas_sin_repe)
-   # df_train.insert(0, 'Enfermedad', 0)
-    #df_train.insert(0, 'id_Enfermedad', 0)
+
  
     
     data_agrupado = (data.groupby("Enfermedad")
@@ -165,37 +149,26 @@ def generate_data_matrix (clean_and_processed_enfermedades: pd.DataFrame):
     j=0
     while (z<repeticiones):
     
-  #  print ("entra")
+
         i=0
         for a in data_agrupado["Enfermedad"]:
-           # print ("Enfermedad: ", a)
-        #vector_enfermedad.append(a)
-        #lista=[]
+       
             lst = [0] * ((len(sintomas_sin_repe)))
            
             df_train.loc[len(df_train)] = lst
-           # df_train["Enfermedad"][j]=a
-            #df_train["id_Enfermedad"][j]=(i)
+      
            
             pos=0
             for b in data_agrupado["Sintoma"][i]:
-                valor_aleatorio = random.random()
                 frecuencia=data_agrupado["Frecuencia"][i][pos]
-            #    print ("frecuencia:", frecuencia)
                 if (frecuencia=="Muy frecuente (99-80%)"):
-             #       print (b)
-              #      print ("es muy frecuente")
-                    #if (valor_aleatorio>0.4):
+             
                         valor_entero=3
-                    #else:
-                     #   valor_entero=0
+                
                 elif (frecuencia=="Frecuente (79-30%)"):
-               #     print (b)
-                #    print ("es frecuente")
-                    #if (valor_aleatorio>0.6):
+           
                         valor_entero=2
-                    #else:
-                     #   valor_entero=0
+                
                          
                 elif (frecuencia=="Obligatorio (100%)"):
                     valor_entero=4
@@ -209,11 +182,61 @@ def generate_data_matrix (clean_and_processed_enfermedades: pd.DataFrame):
             j=j+1
             i=i+1
         z=z+1
-        print ("VUELTA: ", z)
+       
         
     df_train=_cambiar_columnas(df_train)    
     df_matrix=df_train.transpose()
-    print ("VUELTA: ", df_matrix.shape)   
-        
+   
+   
+  
+   
 
     return df_matrix  
+
+
+#------------------------------------------------------------------------------------------------------#
+
+#Función cuarta del pipeline procesamiento de datos. Se encarga de calcular dos matrices de trabajo .
+#La primera de similitud entre los síntomas, y la segunda, que guarda en CSV, la de recomendaciones
+#Esta última de recomendación será cargada en el momento de calcular una recomendación de enfermedad 
+#dado un síntoma.
+
+def generate_data_recommendations (data_scoring: pd.DataFrame):
+
+
+    sim_matrix= sklearn.metrics.pairwise.cosine_similarity(data_scoring)
+
+    sintomas_k = sim_matrix.dot(data_scoring) / np.array([np.abs(sim_matrix).sum(axis=1)]).T
+    dataframe_recomendaciones= pd.DataFrame(sintomas_k)
+    dataframe_recomendaciones.transpose()
+
+    return dataframe_recomendaciones  
+
+
+  #------------------------------------------------------------------------------------------------------#
+
+#Función quinta del pipeline procesamiento de datos. Genera un CSV con todas las enfermedades registradas
+
+
+def generate_data_enfermedades (clean_and_processed_enfermedades: pd.DataFrame):
+
+    data=clean_and_processed_enfermedades
+    df_Enfermedades=data.groupby (["Enfermedad"]).count().reset_index()
+    df_Enfermedades=df_Enfermedades.drop(["Sintoma","Frecuencia"], axis=1)
+    df_Enfermedades=df_Enfermedades.reset_index()
+
+    return df_Enfermedades
+
+ #------------------------------------------------------------------------------------------------------#
+
+#Función sexta del pipeline procesamiento de datos. Genera un CSV con todas los sítomas registrados
+
+def generate_data_sintomas (clean_and_processed_enfermedades: pd.DataFrame):
+
+    data=clean_and_processed_enfermedades
+    df_Sintomas=data.groupby (["Sintoma"]).count().reset_index()
+    df_Sintomas=df_Sintomas.drop(["Enfermedad","Frecuencia"], axis=1)
+
+    return df_Sintomas
+
+

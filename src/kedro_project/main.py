@@ -1,85 +1,36 @@
-from logging import Logger
-from typing import List
 import streamlit as st
-import yaml
-from kedro.framework.project import find_pipelines
-from kedro.pipeline import Pipeline
 import pandas as pd
 from pipelines.data_science import nodes
 
 
-
+#Función interna para hacer lectura de CSV
 def load_from_csv (path):
     data=pd.read_csv(path)
     return data  
-df_matrix=load_from_csv("/Users/o002629/Documents/Kschool/Master/TFM_project/data/03_primary/df_matrix.csv")
-df_enfermedades= load_from_csv("data/01_raw/enfermedades.csv")
-df_sintomas= load_from_csv("data/01_raw/sintomas.csv")
-df_todo=load_from_csv("data/03_primary/sintomas_and_enfermedades_prepaired.csv")
 
 
+#------------------------------------------------------------------------------------------------------#
 
+#INSTRUCCIONES PARA STREAMLIT INTERFAZ WEB
 
-
-
-
+#Leemos los Síntomas existentes para que sean cargados en el multiselect de Streamlit (combo multiseleccionable)
+df_sintomas= load_from_csv("data/03_primary/sintomas.csv")
 options = st.multiselect(
             'Sintoma',
             df_sintomas,
             [])
-button_press = st.button("Pulsa para comenzar Análisis")
+#Incluimos el botón para comenzar el Analísis y Recomendación. 
+button_press = st.button("Pulsa para comenzar Análisis y Recomendador")
+
 if (button_press):
-   
-   
+    #Una vez pulsado el botón, se agrupan todos los síntomas marcados y se realiza la llamada al recomendador 
     sintomas=[]
-    for i in options:
-        #opciones.append(i)
-      
+    for i in options: #
         sintomas.append(i)
-
-   #print(options)
     
-    
-
-    #sintomas=parameters["sintomas"]
-  
-   # Logger.info(f'sintomas?={}')
-        diccionario={
-                    "sintomas" : sintomas,
-                    "clasificados" : 1000
-        }
-        resul=[]
-    #resul=nodes.predict_collaborative_filtering_ser_based (df_matrix,diccionario,df_sintomas,df_enfermedades,df_todo)
-    #def trata_sintomas2 (sintomas,df_transpuesta,df_enfermedades,df_sintomas,df_todo ):
-        resul,agrup,sumas=nodes.trata_sintomas_copy(diccionario,df_matrix,df_enfermedades,df_sintomas,df_todo)
-    #trata_sintomas2 (parameters: Dict,df_transpuesta,df_enfermedades,df_sintomas,df_todo):
-    #if len(resul)>0:
-       # resul=resul.drop(0, axis=1)
-    
-   # button_press_agrupado = st.button("Agrupado")
-    
+    #La función llamada recomendador recoge todo los sintomas, analiza una recomendación conjunta para todos ellos y devuelve un listado ranking listo para visualizar
+    ranking=nodes.llamada_recomendador(sintomas)
 
 
-    
-      
-   
-
-# Using "with" notation
-#add_radio = st.radio(
- #       "Choose a shipping method",
-  #      ("Sin agrupar", "Agrupado")
-#)
-      #  button_press = st.button("Cambiar")        
-    
-  
-    #st.dataframe(resul)
-   
-    #st.dataframe(agrup)
-    st.dataframe(sumas,1800,600)
-    #st.write(sumas)
-
-        
-
-    
-   
-
+    #Finalmente,se pinta en pantalla el listado que ha montado la función llamada_recomendador
+    st.dataframe(ranking,1800,600)

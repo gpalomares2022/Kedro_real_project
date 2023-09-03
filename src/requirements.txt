@@ -18,8 +18,10 @@ kedro==0.18.5
 kedro-datasets[pandas.CSVDataSet, pandas.ExcelDataSet, pandas.ParquetDataSet]~=1.0.2 # Specify Kedro-Datasets dependencies
 kedro-viz~=5.0                                 # Visualise your pipelines
 scikit-learn~=1.0                               # For modelling in the data science pipeline
-xgboost==1.7.4
 streamlit==1.20.0
+
+
+
 
 
 

@@ -8,22 +8,43 @@ processed_xml_enfermedades:
  type: pandas.XMLDataSet
  filepath: data/01_raw/enfermedades.xml
 
+#CSV con las enfermedades-sintomas-frecuencias recogidas del XML en la lectura inicial
 csv_enfermedades_and_sintomas:
  type: pandas.CSVDataSet
- filepath: data/01_raw/sintomas_and_enfermedades_prepaired.csv
+ filepath: data/02_intermediate/sintomas_and_enfermedades_loaded_from_xml.csv
 
+#CSV con la información ya preparada (pasado EDA). 
 clean_and_processed_enfermedades:
   type: pandas.CSVDataSet
-  filepath: data/03_primary/sintomas_and_enfermedades_prepaired.csv
- 
-data_matrix:
+  filepath: data/02_intermediate/sintomas_and_enfermedades_prepaired_post_eda.csv
+
+#Matriz de Scorings de enfermedades con síntomas 
+data_scoring:
  type: pandas.CSVDataSet
- filepath: data/03_primary/df_matrix.csv 
+ filepath: data/03_primary/df_scoring.csv 
+
+
+#Matriz de Recomendaciones entre enfermedades y sintomas  
+data_recommendations:
+ type: pandas.CSVDataSet
+ filepath: data/04_feature/df_recommendations.csv  
+
+
+
+
+csv_sintomas:
+
+ type: pandas.CSVDataSet
+ filepath: data/03_primary/sintomas.csv
 
 csv_enfermedades:
 
  type: pandas.CSVDataSet
- filepath: data/01_raw/enfermedades.csv
+ filepath: data/03_primary/enfermedades.csv
+
+
+
+
 
 data_calculated_scoring:
 
@@ -38,28 +59,7 @@ data_calculated_multi_scoring_agrup:
  type: pandas.CSVDataSet
  filepath: data/07_model_output/Data_Calculated_Multi_agrup.csv
 
-csv_sintomas:
 
- type: pandas.CSVDataSet
- filepath: data/01_raw/sintomas.csv
 
-classificator:
-  type: pickle.PickleDataSet
-  filepath: data/06_models/model.pickle 
 
-X_train:
-  type: pickle.PickleDataSet
-  filepath: data/03_primary/model_input_table_X_train.pickle
-
-y_train:
-  type: pickle.PickleDataSet
-  filepath: data/03_primary/model_input_table_y_train.pickle
-
-X_test:
-  type: pickle.PickleDataSet
-  filepath: data/03_primary/model_input_table_X_test.pickle
-
-y_test:
-  type: pickle.PickleDataSet
-  filepath: data/03_primary/model_input_table_y_test.pickle
 

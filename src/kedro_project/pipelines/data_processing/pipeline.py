@@ -5,7 +5,7 @@ generated using Kedro 0.18.5
 
 from kedro.pipeline import Pipeline, node, pipeline
 
-from .nodes import import_enfermedades_xml, clean_selection_and_preparation_data, generate_data_matrix, generate_data_enfermedades, generate_data_sintomas
+from .nodes import import_enfermedades_xml, clean_selection_and_preparation_data, generate_data_scoring, generate_data_recommendations, generate_data_enfermedades, generate_data_sintomas
   
 
 """aqui importamos las funciones de nodes (archivo nodes de la carpeta que tiene pipeline)"""
@@ -38,13 +38,25 @@ def create_pipeline(**kwargs) -> Pipeline:
             ),
             node(
 
-               func=generate_data_matrix,
+               func=generate_data_scoring,
 
                inputs="clean_and_processed_enfermedades",
 
-               outputs="data_matrix",
+               outputs="data_scoring",
 
-               name="generate_data_matrix_node",
+               name="generate_data_scoring_node",
+
+            ),
+           
+            node(
+
+               func=generate_data_recommendations,
+
+               inputs="data_scoring",
+
+               outputs="data_recommendations",
+
+               name="generate_data_recommendations_node",
 
             ),
             node(

@@ -6,7 +6,7 @@
 model_options:
   sintoma: "Gastroesophageal reflux"
   sintomas: ['Dysphagia', 'Cough', 'Gastroesophageal reflux']
-  clasificados: 100
+  clasificados: 1000
   test_size: 0.2
   random_state: 3
   target: price
