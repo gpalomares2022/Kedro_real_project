@@ -28,7 +28,8 @@ def _cambiar_columnas(df):
         
     return df
 
-#Función interna para hacer sustituciones de una cadena, y sea más fácil de trabajar el XML
+#Función privada, que usa import_enfermedades_xml, para eliminar carácteres innecesarios 
+#en los nombres encontrados en el XML fuente (para enfermedades y frecuencias)
 def _limpia_nombre (cadena):
     
     cadena_str= str(cadena)
@@ -40,7 +41,9 @@ def _limpia_nombre (cadena):
 
 #------------------------------------------------------------------------------------------------------#
 
-#Función primera del pipeline procesamiento de datos.  Se encarga de coger el XML y cargar la información de enfermedades-sintomas-frecuencias
+#Función primera del pipeline procesamiento de datos.  Se encarga de coger el XML y cargar la información de enfermedades-sintomas-frecuencias.
+#Extrae en un dataframe los datos de Enfermedades-Síntomas-Frecuencias del XML de Orphadata. 
+
 def import_enfermedades_xml(parameters: Dict):
 
     xml=open(parameters["path"], encoding='ISO-8859-1')
@@ -77,6 +80,9 @@ def import_enfermedades_xml(parameters: Dict):
 #------------------------------------------------------------------------------------------------------#
 
 #Función segunda del pipeline procesamiento de datos. Se encarga de aplicar EDA sobre el CSV disponible tras la lectura del XML.
+#En concreto: elimina registros duplicados, los nulos, y los registros que contienen síntomas que sólo aparecen menos de 50 veces 
+#en nuestra muestra. Además, se queda con los registros de Enfermedad-Sintoma-Frecuencia que tengan una frecuencia "Muy frecuente",
+#  "Frecuente", "Obligatorio" y "Ocasional". Elimina pues los registros con frecuencia Muy poco frecuente y Excluyente.
 
 def clean_selection_and_preparation_data(csv_enfermedades: pd.DataFrame): 
         
@@ -127,8 +133,15 @@ def clean_selection_and_preparation_data(csv_enfermedades: pd.DataFrame):
 
 #------------------------------------------------------------------------------------------------------#
 
-#Función tercera del pipeline procesamiento de datos. Se encarga de calcular los ratings o scoring de relación entre enfermedades
-#y síntomas. En función de la frecuencia dará un valor de 1,2,3, o 4
+#Función tercera del pipeline procesamiento de datos. Función que dado un dataframe de entrada (con todas los registros existentes
+#  entre enfermedades, sus síntomas y la frecuencia de aparición), genera una matriz de enfermedades x sintomas, formada por valores
+#  únicamente en celdas donde un síntoma concreto (fila) aparezca en la enfermedad. El valor que tendrá dependerá de la frecuencia de
+#  aparición de dicho síntoma en la enfermedad (puntos) de tal forma que si es una frecuencia alta la aparición del síntoma en la enfermedad,
+#  tendrá más puntuación que una frecuencia más baja. Se persigue con esto disponer de una matriz de puntuaciones/ratings donde cruzamos todos
+#  los síntomas con todas las enfermedades, con un conjunto de puntuaciones.
+# Estas son las puntuaciones de acuerdo a la existencia de un síntoma en una enfermedad: Muy frecuente"=3,
+#  "Frecuente"=2, "Obligatorio"=4 y "Ocasional"=1. El resto de celdas tendrá un valor 0
+
 def generate_data_scoring (clean_and_processed_enfermedades: pd.DataFrame):
     
     data=clean_and_processed_enfermedades
