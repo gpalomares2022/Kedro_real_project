@@ -83,6 +83,8 @@ def recommendation_collaborative_filtering_user_based( sintoma,
     #Cargamos los índices dado el id_sintoma. Aquí tendríamos los índices de las enfermedades 
     enfermedades=df_recomendaciones.argsort()[id_sintoma]
     vector_id_enfermedad_scoring=[]
+    #Inicializamos nuestro vector TOTAL que tendrá las parejas de "enfermedad" /scoring de recomendación
+    #(valor en la matriz recomendaciones)
     for  i,id_enfermedad in enumerate(enfermedades[-elementos:]):
         #Ahora recorremos las enfermedades asociadas y vamos guardando. Nos quedamos con los X elementos.
         vector_enfermedades=[]
