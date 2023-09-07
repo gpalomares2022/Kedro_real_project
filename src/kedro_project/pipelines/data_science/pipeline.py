@@ -1,7 +1,7 @@
 from kedro.pipeline import Pipeline, node, pipeline
 
 
-from .nodes import predict_collaborative_filtering_ser_based
+from .nodes import recommendation_collaborative_filtering_user_based
 
 
 def create_pipeline(**kwargs) -> Pipeline:
