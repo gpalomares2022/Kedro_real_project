@@ -83,7 +83,7 @@ def import_enfermedades_xml(parameters: Dict):
 #En concreto: elimina registros duplicados, los nulos, y los registros que contienen síntomas que sólo aparecen menos de 50 veces 
 #en nuestra muestra. Además, se queda con los registros de Enfermedad-Sintoma-Frecuencia que tengan una frecuencia "Muy frecuente",
 #  "Frecuente", "Obligatorio" y "Ocasional". Elimina pues los registros con frecuencia Muy poco frecuente y Excluyente.
-
+#En notebook representa a las funciones eda_data y selection_data_frecuency unidas.
 def clean_selection_and_preparation_data(csv_enfermedades: pd.DataFrame): 
         
 
@@ -213,6 +213,9 @@ def generate_data_scoring (clean_and_processed_enfermedades: pd.DataFrame):
 #La primera de similitud entre los síntomas, y la segunda, que guarda en CSV, la de recomendaciones
 #Esta última de recomendación será cargada en el momento de calcular una recomendación de enfermedad 
 #dado un síntoma.
+#En este código, teniendo en cuenta que trabajamos con pipelines y guardado automático de CSV, no 
+#se va a trabajar con SQlite3 de cara a guardar en bbdd las matrices (ya están disponibles en CSV para 
+# el trabajo)
 
 def generate_data_recommendations (data_scoring: pd.DataFrame):
 
@@ -233,8 +236,8 @@ def generate_data_recommendations (data_scoring: pd.DataFrame):
 
 def generate_data_enfermedades (clean_and_processed_enfermedades: pd.DataFrame):
 
-    data=clean_and_processed_enfermedades
-    df_Enfermedades=data.groupby (["Enfermedad"]).count().reset_index()
+    
+    df_Enfermedades=clean_and_processed_enfermedades.groupby (["Enfermedad"]).count().reset_index()
     df_Enfermedades=df_Enfermedades.drop(["Sintoma","Frecuencia"], axis=1)
     df_Enfermedades=df_Enfermedades.reset_index()
 
@@ -246,8 +249,7 @@ def generate_data_enfermedades (clean_and_processed_enfermedades: pd.DataFrame):
 
 def generate_data_sintomas (clean_and_processed_enfermedades: pd.DataFrame):
 
-    data=clean_and_processed_enfermedades
-    df_Sintomas=data.groupby (["Sintoma"]).count().reset_index()
+    df_Sintomas=clean_and_processed_enfermedades.groupby (["Sintoma"]).count().reset_index()
     df_Sintomas=df_Sintomas.drop(["Enfermedad","Frecuencia"], axis=1)
 
     return df_Sintomas

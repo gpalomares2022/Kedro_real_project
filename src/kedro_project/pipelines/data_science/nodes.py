@@ -64,7 +64,7 @@ def _monta_listado (scoring_enfermedades,id_Sintoma, df_Enfermedades, df_Sintoma
 #------------------------------------------------------------------------------------------------------#
 
 #Función interna que recibe un Síntoma concreto y devuelve un listado de X enfermedades recomendadas (por scoring de mayor a menor)
-def predict_collaborative_filtering_ser_based( sintoma,
+def recommendation_collaborative_filtering_user_based( sintoma,
                                               df_Sintomas: pd.DataFrame, df_Enfermedades: pd.DataFrame, 
                                               df_EnfeySinto_select: pd.DataFrame):
   
@@ -127,7 +127,7 @@ def llamada_recomendador (sintomas):
     for i in sintomas:    
         #Llamamos a la función _predict_collaborative_filtering_ser_based con cada uno de los síntomas.
         #Ésta nos va a devolver, para cada síntoma, un listado de X enfermedades recomendadas (por scoring de mayor a menor)
-        enfermedades_predecidas=predict_collaborative_filtering_ser_based(i,df_sintomas,df_enfermedades,df_sintomas_enfermedades_eda)
+        enfermedades_predecidas=recommendation_collaborative_filtering_user_based(i,df_sintomas,df_enfermedades,df_sintomas_enfermedades_eda)
       
         #Generamos Dataframe con el listado recibido, y eliminamos nulos
         enfermedades_predecidas=pd.DataFrame(enfermedades_predecidas)
