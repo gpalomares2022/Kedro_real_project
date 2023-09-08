@@ -130,7 +130,7 @@ def llamada_recomendador (sintomas):
         #Llamamos a la función _predict_collaborative_filtering_ser_based con cada uno de los síntomas.
         #Ésta nos va a devolver, para cada síntoma, un listado de X enfermedades recomendadas (por scoring de mayor a menor)
         enfermedades_predecidas=recommendation_collaborative_filtering_user_based(i,df_sintomas,df_enfermedades,df_sintomas_enfermedades_eda)
-      
+     
         #Generamos Dataframe con el listado recibido, y eliminamos nulos
         enfermedades_predecidas=pd.DataFrame(enfermedades_predecidas)
         enfermedades_predecidas=enfermedades_predecidas.dropna()
@@ -143,6 +143,7 @@ def llamada_recomendador (sintomas):
   
     #Hemos terminado de agrupar todas las enfermedades recomendadas por cada síntoma.
     #Si este listado no está vacío montamos el ranking!! 
+    
     if len(enfermedades_scoring)>0:
      
         #Generamos una agrupación de Enfermedad, los síntomas que hemos marcado en los que aparece, su frecuencia, y el scoring
