@@ -1,5 +1,5 @@
-"""TFM_PROJECT file for ensuring the package is executable
-as `tfm-project` and `python -m tfm_project`
+"""kedro_project file for ensuring the package is executable
+as `kedro-project` and `python -m kedro_project`
 """
 import importlib
 from pathlib import Path

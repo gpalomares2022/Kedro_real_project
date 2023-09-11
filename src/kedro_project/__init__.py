@@ -1,4 +1,4 @@
-"""TFM_PROJECT
+"""kedro_project
 """
 
 __version__ = "0.1"
