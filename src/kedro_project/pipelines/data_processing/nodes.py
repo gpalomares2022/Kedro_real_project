@@ -114,9 +114,11 @@ def clean_selection_and_preparation_data(csv_enfermedades: pd.DataFrame):
     data=data[(data['Frecuencia']=="Muy frecuente (99-80%)") |
               (data['Frecuencia']=="Frecuente (79-30%)") |
               (data['Frecuencia']=="Obligatorio (100%)") |
-              (data['Frecuencia']=="Ocasional (29-5%)")
+              (data['Frecuencia']=="Ocasional (29-5%)") |
+              (data['Frecuencia']=="Muy poco frecuente (4-1%)")
               
-             ] 
+             ]
+        
     numero=float(data["Enfermedad"].nunique())
 
     logger.info ("Final después de EDA")
@@ -175,18 +177,14 @@ def generate_data_scoring (clean_and_processed_enfermedades: pd.DataFrame):
             for b in data_agrupado["Sintoma"][i]:
                 frecuencia=data_agrupado["Frecuencia"][i][pos]
                 if (frecuencia=="Muy frecuente (99-80%)"):
-             
-                        valor_entero=3
-                
+                        valor_entero=4
                 elif (frecuencia=="Frecuente (79-30%)"):
-           
-                        valor_entero=2
-                
-                         
+                        valor_entero=3
                 elif (frecuencia=="Obligatorio (100%)"):
-                    valor_entero=4
-
+                    valor_entero=5
                 elif (frecuencia=="Ocasional (29-5%)"):
+                    valor_entero=2
+                elif (frecuencia=="Muy poco frecuente (4-1%)"):
                     valor_entero=1
                     
                 df_train[b][j]=valor_entero
