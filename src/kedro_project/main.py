@@ -15,10 +15,18 @@ def load_from_csv (path):
 
 #Leemos los Síntomas existentes para que sean cargados en el multiselect de Streamlit (combo multiseleccionable)
 df_sintomas= load_from_csv("data/03_primary/sintomas.csv")
+st.sidebar.title("TFM Máster Data Science - KSchool - Gabriel Palomares")
+
+st.sidebar.title ("Sistemas Recomendador de Enfermedades raras")
+st.sidebar.header("")
+st.sidebar.header("")
+st.sidebar.header("")
+
 button_press = st.sidebar.button("Pulsa para comenzar Análisis y Recomendador")
+st.sidebar.header("")
 
 options = st.sidebar.multiselect(
-            'Sintoma',
+            'Seleccione aquí los síntomas del paciente, y luego pulse el botón superior para comenzar el análisis y recomendación.',
             df_sintomas,
             [])
 #Incluimos el botón para comenzar el Analísis y Recomendación. 
