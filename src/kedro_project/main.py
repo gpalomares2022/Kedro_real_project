@@ -15,12 +15,13 @@ def load_from_csv (path):
 
 #Leemos los Síntomas existentes para que sean cargados en el multiselect de Streamlit (combo multiseleccionable)
 df_sintomas= load_from_csv("data/03_primary/sintomas.csv")
-options = st.multiselect(
+button_press = st.sidebar.button("Pulsa para comenzar Análisis y Recomendador")
+
+options = st.sidebar.multiselect(
             'Sintoma',
             df_sintomas,
             [])
 #Incluimos el botón para comenzar el Analísis y Recomendación. 
-button_press = st.button("Pulsa para comenzar Análisis y Recomendador")
 
 if (button_press):
     #Una vez pulsado el botón, se agrupan todos los síntomas marcados y se realiza la llamada al recomendador 
@@ -33,4 +34,4 @@ if (button_press):
 
 
     #Finalmente,se pinta en pantalla el listado que ha montado la función llamada_recomendador
-    st.dataframe(ranking,1800,600)
+    st.dataframe(ranking,3800,6000)
