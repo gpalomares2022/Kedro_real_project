@@ -75,3 +75,5 @@ In the project root, run:
 ```
 streamlit run src/kedro_project/main.py
 ```
+
+Please read the TFM documentation for more details.
