@@ -3,22 +3,3 @@
 #
 # Documentation for this file format can be found in "Parameters"
 # Link: https://kedro.readthedocs.io/en/0.18.5/kedro_project_setup/configuration.html#parameters
-model_options:
-  sintoma: "Gastroesophageal reflux"
-  sintomas: ['Dysphagia', 'Cough', 'Gastroesophageal reflux']
-  clasificados: 1000
-  test_size: 0.2
-  random_state: 3
-  target: price
-  max_depth: 30
-  n_estimators : 1000
-  learning_rate: 0.05
-  features:
-    - engines
-    - passenger_capacity
-    - crew
-    - d_check_complete
-    - moon_clearance_complete
-    - iata_approved
-    - company_rating
-    - review_scores_rating

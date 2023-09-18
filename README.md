@@ -3,7 +3,7 @@
 The objective of this project is to design and develop an application (in this case for use in Primary Care), which uses a Recommendation System, in order to offer the doctor a ranking of possible rare diseases that could be considered for a patient according to the symptoms they present.
 
 In order to work with the Recommendation System (recommendations matrix), processing is necessary that uses only the Orphadata "disease-symptom-frequency" file as an input source. 
-You must have the Orphadata source file, in:  "/data/01_raw" with name "enfermedades.xml". 
+You must have the Orphadata source file, in:  "/data/01_raw" with name "enfermedades.xml". You can change the file name requirement in: /conf/base/parameters/data_processing.yml
 
 This source is available on the Orphadata platform (https://www.orphadata.com/data/xml/es_product4.xml) or by downloading from this Google Drive link: https://drive.google.com/file/d/1ErL1M0OgDE_fkhXeKlaFHw6zvbh5gkN2/view?usp=drive_link
 
