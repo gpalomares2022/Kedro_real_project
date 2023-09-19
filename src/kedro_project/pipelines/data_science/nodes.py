@@ -203,6 +203,35 @@ def llamada_recomendador (sintomas):
 
 
 
+def llamada_recomendador_metrica (sintoma):
+
+    #Cargamos las enfermedades, los sintomas y el listado que contiene la tupla enfermedad-síntoma-frecuencia (ya con eda pasado)
+    df_enfermedades= _load_from_csv("data/03_primary/enfermedades.csv")
+    df_sintomas= _load_from_csv("data/03_primary/sintomas.csv")
+    df_sintomas_enfermedades_eda=_load_from_csv("data/02_intermediate/sintomas_and_enfermedades_prepaired_post_eda.csv")
+   
+    #Preparamos un listado que acumulará todas las enfermedades recomendadas de cada síntoma    
+    enfermedades_scoring=[]
+    enfermedades_scoring=pd.DataFrame(enfermedades_scoring)
+  
+   
+    #Para cada uno de los sintomas que recibimos en la lista "sintomas"
+    
+        #Llamamos a la función _predict_collaborative_filtering_ser_based con cada uno de los síntomas.
+        #Ésta nos va a devolver, para cada síntoma, un listado de X enfermedades recomendadas (por scoring de mayor a menor)
+    enfermedades_predecidas=recommendation_collaborative_filtering_user_based(sintoma,df_sintomas,df_enfermedades,df_sintomas_enfermedades_eda)
+
+    enfermedades_predecidas_primeras_cinto=enfermedades_predecidas.head(5) 
+    lista=enfermedades_predecidas_primeras_cinto.to_numpy().transpose().tolist()   
+    final=lista[1]    
+  
+    #Hemos terminado de agrupar todas las enfermedades recomendadas por cada síntoma.
+    #Si este listado no está vacío montamos el ranking!! 
+    
+  
+
+ 
+    return  final
 
 
 
