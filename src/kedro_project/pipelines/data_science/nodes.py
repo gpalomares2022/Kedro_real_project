@@ -1,4 +1,6 @@
 import logging
+from random import randint
+import random
 import sqlite3
 from typing import Dict
 from git import List
@@ -8,7 +10,7 @@ import sklearn
 
 
 import numpy as np
-
+#from iteration_utils import duplicates
 
 
 logger = logging.getLogger(__name__)
@@ -20,6 +22,15 @@ def _load_from_csv (path):
 
 
 
+
+def _no_hay_repetidos(listNums):
+  s=set (listNums)
+ # print (s)
+ # print (listNums)
+  return len(s)==len(listNums)
+
+def _desordenar(lista):
+    return random.sample(lista, len(lista))
 #------------------------------------------------------------------------------------------------------#
 
 #Función que dado un listado de enfermedades y scoring, monta un listado completo con Frecuencia, Scoring... Es una función para visualización
@@ -224,17 +235,28 @@ def llamada_recomendador_metrica (sintoma):
     enfermedades_predecidas_primeras_cinto=enfermedades_predecidas.head(5) 
     lista=enfermedades_predecidas_primeras_cinto.to_numpy().transpose().tolist()   
     final=lista[1]
-    buenos=list(lista[1])  
-    final.append ("gabi") 
-    final.append ("gabi2")
-    final.append ("gabi3")
-    final.append ("gabi4")
-    final.append ("gabi5")     
+    buenos=list(lista[1])
+    lista_enfermedades=df_enfermedades.to_numpy().transpose().tolist()   
+    lista_enfermedades=lista_enfermedades[1]
+    
+    i=0
+    while (i<5):
+        valor=  randint(0, len(lista_enfermedades))
+        final.append(lista_enfermedades[valor])
+        if (not _no_hay_repetidos(final)):
+            #print ("ojo que hay repes, borro")
+            #print (i)
+            #print (5+i)
+            del final[5+i]
+        else:
+            
+ 
+            i=i+1 
   
-    #Hemos terminado de agrupar todas las enfermedades recomendadas por cada síntoma.
-    #Si este listado no está vacío montamos el ranking!! 
-    print ("agg")
-    print (buenos)
+    final=_desordenar(final)
+
+   
+ 
 
  
     return  final,buenos

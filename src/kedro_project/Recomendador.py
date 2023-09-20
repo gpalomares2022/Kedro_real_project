@@ -47,5 +47,5 @@ if (button_press):
 
     #Finalmente,se pinta en pantalla el listado que ha montado la función llamada_recomendador
     st.dataframe(ranking,3800,6000)
-    if 'sintoma' not in st.session_state: 
+    if 'sintoma' in st.session_state: 
         del st.session_state.sintoma
