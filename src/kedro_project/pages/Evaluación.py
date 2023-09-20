@@ -117,16 +117,25 @@ if (len(ranking)>0):
                     i=i+1    
 
                 total=total*20
+
+                i=0
+                enfermedades_no_acertadas=[]
+                while (i<len(buenos)):
+                    if buenos[i] not in enfermedades_acertadas:
+                        enfermedades_no_acertadas.append(buenos[i])
+                    i=i+1
+                    
                
                 st.header("Y el acierto es: " + str(total)+"%")
                 print ("Listado de enfermedades, ofrecidas por el recomendador, que han sido diagnosticadas también por el usuario: ")
                 print (enfermedades_acertadas)
-                df_enfermedades_acertadas=pd.DataFrame(enfermedades_acertadas)
-                df_enfermedades_acertadas.to_csv("data/04_feature/enfermedades_acertadas.csv")
+
+                print ("Listado de enfermedades, ofrecidas por el recomendador, que NO han sido diagnosticadas por el usuario: ")
+                print (enfermedades_no_acertadas)
+                
                 print ("Listado de enfermedades, NO ofrecidas por el recomendador, que han sido diagnosticadas por el usuario: ")
                 print (enfermedades_no_recomendadas)
-                df_enfermedades_no_recomendadas=pd.DataFrame(enfermedades_no_recomendadas)
-                df_enfermedades_no_recomendadas.to_csv("data/04_feature/enfermedades_no_recomendadas.csv")
+               
            
    # 
    # 
