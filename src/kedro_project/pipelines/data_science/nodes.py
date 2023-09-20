@@ -223,15 +223,21 @@ def llamada_recomendador_metrica (sintoma):
 
     enfermedades_predecidas_primeras_cinto=enfermedades_predecidas.head(5) 
     lista=enfermedades_predecidas_primeras_cinto.to_numpy().transpose().tolist()   
-    final=lista[1]    
+    final=lista[1]
+    buenos=list(lista[1])  
+    final.append ("gabi") 
+    final.append ("gabi2")
+    final.append ("gabi3")
+    final.append ("gabi4")
+    final.append ("gabi5")     
   
     #Hemos terminado de agrupar todas las enfermedades recomendadas por cada síntoma.
     #Si este listado no está vacío montamos el ranking!! 
-    
-  
+    print ("agg")
+    print (buenos)
 
  
-    return  final
+    return  final,buenos
 
 
 
