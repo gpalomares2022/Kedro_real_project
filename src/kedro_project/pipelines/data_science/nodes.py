@@ -20,15 +20,13 @@ def _load_from_csv (path):
     data=pd.read_csv(path)
     return data  
 
-
-
-
+#Función interna que te dice si una lista tiene elementos repetidos
 def _no_hay_repetidos(listNums):
   s=set (listNums)
- # print (s)
- # print (listNums)
+ 
   return len(s)==len(listNums)
 
+#Función interna que desordenada de posición los elementos de una lista
 def _desordenar(lista):
     return random.sample(lista, len(lista))
 #------------------------------------------------------------------------------------------------------#
@@ -120,7 +118,7 @@ def recommendation_collaborative_filtering_user_based( sintoma,
 
 #------------------------------------------------------------------------------------------------------#
 
-#Función llamada desde el main.py de la Interfaz Web vía Streamlit. Es la que recibirá el listado de síntomas seleccionados en el desplegable (multi-seleccionable)
+#Función llamada desde el Recomendador.py de la Interfaz Web vía Streamlit. Es la que recibirá el listado de síntomas seleccionados en el desplegable (multi-seleccionable)
 #y devolverá un listado modo ranking con las enfermedades recomendados, cómo aparecen dichas enfermedades en los síntomas que se han seleccionado, y un scoring
 #que clasifica
 
@@ -213,7 +211,12 @@ def llamada_recomendador (sintomas):
     return  df_enfermedades_suma
 
 
+#------------------------------------------------------------------------------------------------------#
 
+#Función llamada desde el Evaluacion.py de la Interfaz Web vía Streamlit. Es la que recibirá un único sintoma seleccionado en el desplegable
+#y devolverá un listado con los nombres de 10 enfermades: 5 primeras recomendadas por nuestro algoritmo, y 5 aleatorias. 
+# Se devolverán mezcladas.
+#También devolvemos, para trabajo, el listado únicamente de las 5 recomendadas
 def llamada_recomendador_metrica (sintoma):
 
     #Cargamos las enfermedades, los sintomas y el listado que contiene la tupla enfermedad-síntoma-frecuencia (ya con eda pasado)
@@ -221,45 +224,45 @@ def llamada_recomendador_metrica (sintoma):
     df_sintomas= _load_from_csv("data/03_primary/sintomas.csv")
     df_sintomas_enfermedades_eda=_load_from_csv("data/02_intermediate/sintomas_and_enfermedades_prepaired_post_eda.csv")
    
-    #Preparamos un listado que acumulará todas las enfermedades recomendadas de cada síntoma    
-    enfermedades_scoring=[]
-    enfermedades_scoring=pd.DataFrame(enfermedades_scoring)
-  
-   
-    #Para cada uno de los sintomas que recibimos en la lista "sintomas"
     
-        #Llamamos a la función _predict_collaborative_filtering_ser_based con cada uno de los síntomas.
-        #Ésta nos va a devolver, para cada síntoma, un listado de X enfermedades recomendadas (por scoring de mayor a menor)
+    #Llamamos a la función _predict_collaborative_filtering_ser_based el síntoma recibido.
+    #Ésta nos va a devolver un listado de X enfermedades recomendadas (por scoring de mayor a menor)
     enfermedades_predecidas=recommendation_collaborative_filtering_user_based(sintoma,df_sintomas,df_enfermedades,df_sintomas_enfermedades_eda)
+    #nos quedamos con las cinco primeras
+    enfermedades_predecidas_primeras_cinco=enfermedades_predecidas.head(5) 
+    lista_enfermedades_predecidas_primeras_cinco=enfermedades_predecidas_primeras_cinco.to_numpy().transpose().tolist()   
+    lista_enfermedades_predecidas_primeras_cinco=list(lista_enfermedades_predecidas_primeras_cinco[1])
+    #Las hemos pasado a lista para trabajar con ellas y return.
 
-    enfermedades_predecidas_primeras_cinto=enfermedades_predecidas.head(5) 
-    lista=enfermedades_predecidas_primeras_cinto.to_numpy().transpose().tolist()   
-    final=lista[1]
-    buenos=list(lista[1])
-    lista_enfermedades=df_enfermedades.to_numpy().transpose().tolist()   
-    lista_enfermedades=lista_enfermedades[1]
+    #Comenzamos a montar también la lista con las 10 enfermedades. Nos quedamos con las 5 recomendadas 
+    
+    lista_diez_enfermedades=enfermedades_predecidas_primeras_cinco.to_numpy().transpose().tolist()   
+    lista_diez_enfermedades=list(lista_diez_enfermedades[1])
+    #y ahora vamos a cargar las aleatorias de todo el listado de enfermedades. Los cargamos y vamos cogiendo.
+    listado_enfermedades_sistema=df_enfermedades.to_numpy().transpose().tolist()   
+    listado_enfermedades_sistema=listado_enfermedades_sistema[1]
     
     i=0
     while (i<5):
-        valor=  randint(0, len(lista_enfermedades))
-        final.append(lista_enfermedades[valor])
-        if (not _no_hay_repetidos(final)):
-            #print ("ojo que hay repes, borro")
-            #print (i)
-            #print (5+i)
-            del final[5+i]
+        valor=  randint(0, len(listado_enfermedades_sistema))
+        lista_diez_enfermedades.append(listado_enfermedades_sistema[valor])
+        if (not _no_hay_repetidos(lista_diez_enfermedades)):
+            #Verificamos que, por casualidad, se ha calculado aleatoriamente una enfermedad que ya estaba incluida por el recomendador 
+            #o por un random anterior. Si es así, la quitamos y volvemos a cargar.
+          
+            del lista_diez_enfermedades[5+i]
         else:
             
  
             i=i+1 
-  
-    final=_desordenar(final)
+    #salen las 5 primeras las recomendadas, y las 5 siguientes las aleatorias. Desordenamos para el experimento
+    lista_diez_enfermedades=_desordenar(lista_diez_enfermedades)
 
    
  
 
  
-    return  final,buenos
+    return  lista_diez_enfermedades,lista_enfermedades_predecidas_primeras_cinco
 
 
 
