@@ -10,9 +10,10 @@ def load_from_csv (path):
 
 
 #------------------------------------------------------------------------------------------------------#
+#Limpiamos sesión
 if 'sintoma' in st.session_state: 
         del st.session_state.sintoma
-        print ("borro en recomendador el sintoma")
+       
 #INSTRUCCIONES PARA STREAMLIT INTERFAZ WEB
 
 #Leemos los Síntomas existentes para que sean cargados en el multiselect de Streamlit (combo multiseleccionable)

@@ -56,12 +56,12 @@ if button_press:
         st.session_state.sintoma=sintoma
         listado_mezclados, solo_los_recomendados=llamada_recomendador_metrica(sintoma)
         df_listado_mezclados=pd.DataFrame(listado_mezclados)
-        _write_to_csv(df_listado_mezclados,"data/04_feature/listado_mezclados.csv")
+        _write_to_csv(df_listado_mezclados,"data/03_primary/listado_mezclados.csv")
         #guardamos en CSV tanto el listado de 10 enfermedades mezcladas, como el listado de las 5 recomendadas
         #Se guardan porque en la navegación, al montarse como un html, cada vez que refrescas tendrías que hacer este cálculo
         #En lugar de hacerlo, cargamos el CSV
         df_solo_los_recomendados=pd.DataFrame(solo_los_recomendados)
-        _write_to_csv(df_solo_los_recomendados,"data/04_feature/listado_solo_los_recomendados.csv")
+        _write_to_csv(df_solo_los_recomendados,"data/03_primary/listado_solo_los_recomendados.csv")
 
 
 
@@ -72,10 +72,10 @@ listado_web_checks = np.zeros(10)
 
 if 'sintoma' in st.session_state:
     #Metemos esta condición de si hay síntoma en sesión, por si hay precarga de la web. En este caso cargaríamos los 2 listados de trabajo 
-    df_listado_mezclados=_load_from_csv("data/04_feature/listado_mezclados.csv")
+    df_listado_mezclados=_load_from_csv("data/03_primary/listado_mezclados.csv")
     listado_mezclados=df_listado_mezclados.to_numpy().transpose().tolist()
     listado_mezclados=listado_mezclados[1]
-    df_solo_los_recomendados=_load_from_csv("data/04_feature/listado_solo_los_recomendados.csv")
+    df_solo_los_recomendados=_load_from_csv("data/03_primary/listado_solo_los_recomendados.csv")
     solo_los_recomendados=df_solo_los_recomendados.to_numpy().transpose().tolist()
     solo_los_recomendados=solo_los_recomendados[1] 
 
@@ -97,7 +97,7 @@ if (len(listado_mezclados)>0):
            
             i=i+1
         #Si hay listado, mostramos también ya el botón de calcular el porcentaje de acierto
-        button_calcular = st.button("Calcular")
+        button_calcular = st.button("Calcular Acierto")
 
         if (button_calcular):
             enfermedades_acertadas=[]

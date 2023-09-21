@@ -78,7 +78,7 @@ Executing Kedro run will only execute the Data_processing pipeline. The prepared
 In the project root, run:
 
 ```
-streamlit run src/kedro_project/main.py
+streamlit run src/kedro_project/Recomendador.py
 ```
 
 Please read the TFM documentation for more details.

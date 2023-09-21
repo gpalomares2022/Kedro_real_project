@@ -9,7 +9,6 @@ import xmltodict
 from typing import Dict
 import logging
 import numpy as np
-
 import warnings
 
 

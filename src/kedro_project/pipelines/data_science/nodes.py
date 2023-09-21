@@ -1,20 +1,17 @@
 import logging
-from random import randint
 import random
-import sqlite3
-from typing import Dict
-from git import List
+import warnings
 import pandas as pd
-import sklearn
 import numpy as np
 from kedro.config import ConfigLoader, MissingConfigException
-from kedro.framework.project import settings
-from pathlib import Path
+
+
 
 
 
 
 logger = logging.getLogger(__name__)
+warnings.filterwarnings("ignore")
 
 #Función interna para hacer lectura de CSV
 def _load_from_csv (path):
@@ -30,6 +27,17 @@ def _no_hay_repetidos(listNums):
 #Función interna que desordenada de posición los elementos de una lista
 def _desordenar(lista):
     return random.sample(lista, len(lista))
+
+# Genera un CSV con todas las enfermedades registradas (sin repetir), dado un datafame con el registro de enfermedades y síntomas existentes
+
+def _generate_data_enfermedades (df_enfermedades_con_sintoma: pd.DataFrame):
+
+    
+    df_Enfermedades=df_enfermedades_con_sintoma.groupby (["Enfermedad"]).count().reset_index()
+    df_Enfermedades=df_Enfermedades.drop(["Sintoma","Frecuencia"], axis=1)
+    df_Enfermedades=df_Enfermedades.reset_index()
+
+    return df_Enfermedades
 #------------------------------------------------------------------------------------------------------#
 
 #Función que dado un listado de enfermedades y scoring, monta un listado completo con Frecuencia, Scoring... Es una función para visualización
@@ -251,12 +259,25 @@ def llamada_recomendador_metrica (sintoma):
     lista_diez_enfermedades=enfermedades_predecidas_primeras_cinco.to_numpy().transpose().tolist()   
     lista_diez_enfermedades=list(lista_diez_enfermedades[1])
     #y ahora vamos a cargar las aleatorias de todo el listado de enfermedades. Los cargamos y vamos cogiendo.
-    listado_enfermedades_sistema=df_enfermedades.to_numpy().transpose().tolist()   
+    #Es importante comentar que, dado que nos viene un síntoma marcado, el listado de enfermedades aleatorias viene
+    #filtrado por enfermedades que tienen este síntoma también.
+    #Cogemos primero el df que tiene el registro de enfermedades-sintomas, y nos quedamos con los datos de enfermedades-sintomas 
+    #donde el sintoma es el seleccionado.
+    df_sintomas_enfermedades_con_sintoma_selec=df_sintomas_enfermedades_eda[df_sintomas_enfermedades_eda["Sintoma"]==sintoma]
+
+    #Ahora ya tenemos el registro de enfermedades y síntomas, pero filtrado por sintoma seleccionado. Vamos a obtener un listado
+    #normal de enfermedades (sólo enfermedades y sin repetir)
+    
+    df_enfermedades_con_sintoma_select=_generate_data_enfermedades (df_sintomas_enfermedades_con_sintoma_selec)
+  
+
+    #El df obtenido lo convertimos a Lista para trabajar con él.
+    listado_enfermedades_sistema=df_enfermedades_con_sintoma_select.to_numpy().transpose().tolist()   
     listado_enfermedades_sistema=listado_enfermedades_sistema[1]
     
     i=0
     while (i<5):
-        valor=  randint(0, len(listado_enfermedades_sistema))
+        valor=  random.randint(0, len(listado_enfermedades_sistema))
         lista_diez_enfermedades.append(listado_enfermedades_sistema[valor])
         if (not _no_hay_repetidos(lista_diez_enfermedades)):
             #Verificamos que, por casualidad, se ha calculado aleatoriamente una enfermedad que ya estaba incluida por el recomendador 
