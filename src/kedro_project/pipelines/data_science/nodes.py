@@ -6,11 +6,12 @@ from typing import Dict
 from git import List
 import pandas as pd
 import sklearn
-
-
-
 import numpy as np
-#from iteration_utils import duplicates
+from kedro.config import ConfigLoader, MissingConfigException
+from kedro.framework.project import settings
+from pathlib import Path
+
+
 
 
 logger = logging.getLogger(__name__)
@@ -77,9 +78,20 @@ def recommendation_collaborative_filtering_user_based( sintoma,
                                               df_Sintomas: pd.DataFrame, df_Enfermedades: pd.DataFrame, 
                                               df_EnfeySinto_select: pd.DataFrame):
   
-   
-    elementos=1000 #ESTA VARIABLE HAY QUE SACARLA.
+    
 
+    #leemos el parámetro elementos, con el que vamos a sacar la lista de recomendados
+    conf_path = str("conf/")
+    conf_loader = ConfigLoader(conf_source=conf_path)
+  
+    try:
+        parameters = conf_loader["parameters"]
+    except MissingConfigException:
+        parameters = {}
+
+    elementos=parameters["elementos"]
+
+   
     #Obtenemos el id del Síntoma (en el CSV de Síntomas) a partir del nombre. Es necesario para poder operar.
     id_sintoma = df_Sintomas[df_Sintomas['Sintoma'] == sintoma].index.values[0]
 
