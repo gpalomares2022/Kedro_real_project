@@ -82,3 +82,7 @@ streamlit run src/kedro_project/Recomendador.py
 ```
 
 Please read the TFM documentation for more details.
+
+## Author
+
+- Gabi Palomares - [LinkedIn](https://www.linkedin.com/in/gabriel-palomares-47727a57/) - [github](https://github.com/gpalomares2022)
