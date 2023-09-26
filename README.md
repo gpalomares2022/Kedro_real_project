@@ -7,6 +7,14 @@ You must have the Orphadata source file, in:  "/data/01_raw" with name "enfermed
 
 This source is available on the Orphadata platform (https://www.orphadata.com/data/xml/es_product4.xml) or by downloading from this Google Drive link: https://drive.google.com/file/d/1ErL1M0OgDE_fkhXeKlaFHw6zvbh5gkN2/view?usp=drive_link
 
+## Clone Repo
+
+With the terminal, in the working directory where you want to clone the project, execute:
+
+	git clone https://https://github.com/gpalomares2022/TFM_project.git
+
+TFM_project will be the project root.
+
 ## Quick steps
 
 At this point you can review the quick steps for installing the TFM project. The readme file provided by Kedro is developed when creating the project with this framework.
