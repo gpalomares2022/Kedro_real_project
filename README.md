@@ -64,7 +64,7 @@ pip install -r src/requirements.txt
 ```
 Now, you can see the work notebook with:
 
-``
+```
 jupyter notebook
 ```
 
