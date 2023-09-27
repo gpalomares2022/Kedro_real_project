@@ -71,6 +71,11 @@ To install them, run:
 ```
 pip install -r src/requirements.txt
 ```
+you can see the work notebook with:
+
+``
+jupyter notebook
+```
 
 ## How to run your Kedro Data_processing pipeline 
 
