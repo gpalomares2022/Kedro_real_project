@@ -67,6 +67,7 @@ Now, you can see the notebook in notebooks/Notebook_TFM.ipynb, with:
 ```
 jupyter notebook
 ```
+Or you can use Anaconda Navigator
 
 ## How to run your Kedro Data_processing pipeline 
 
