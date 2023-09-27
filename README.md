@@ -23,18 +23,9 @@ At this point you can review the quick steps for installing the TFM project. The
 
 This is your new Kedro project, which was generated using `Kedro 0.18.5`.
 
-We need to work with Visual Studio Code and python version `3.10.x`.
+We need to work with python version `3.10.x`.
 
-## Rules and guidelines
-
-In order to get the best out of the template:
-
-* Don't remove any lines from the `.gitignore` file we provide
-* Make sure your results can be reproduced by following a [data engineering convention](https://kedro.readthedocs.io/en/stable/faq/faq.html#what-is-data-engineering-convention)
-* Don't commit data to your repository
-* Don't commit any credentials or your local configuration to your repository. Keep all your credentials and local configuration in `conf/local/`
-
-## How to create/activate a new environment for Kedro
+## How to create/activate a new environment for Kedro (with conda)
 
 In the project root, run:
 
@@ -71,7 +62,7 @@ To install them, run:
 ```
 pip install -r src/requirements.txt
 ```
-you can see the work notebook with:
+Now, you can see the work notebook with:
 
 ``
 jupyter notebook
