@@ -62,7 +62,7 @@ To install them, run:
 ```
 pip install -r src/requirements.txt
 ```
-Now, you can see the work notebook with:
+Now, you can see the notebook in notebooks/Notebook_TFM.ipynb, with:
 
 ```
 jupyter notebook
